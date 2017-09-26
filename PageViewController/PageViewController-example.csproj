@@ -125,4 +125,10 @@
   <ItemGroup>
     <BundleResource Include="Resources\threelines%402x.png" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ClassLibrary1\ClassLibrary1.csproj">
+      <Project>{7ea9914b-86be-49bd-93b7-db702e8903e8}</Project>
+      <Name>ClassLibrary1</Name>
+    </ProjectReference>
+  </ItemGroup>
 </Project>
