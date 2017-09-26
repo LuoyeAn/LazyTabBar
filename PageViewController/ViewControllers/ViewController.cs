@@ -67,7 +67,7 @@ namespace PageViewController.ViewControllers
             {
                 if(view is UIScrollView scrollview)
                 {
-                    scrollview.Delegate = new Test();
+                    scrollview.Delegate = new Test(this);
                 }
             }
 
@@ -365,14 +365,43 @@ namespace PageViewController.ViewControllers
 
         class Test : UIScrollViewDelegate
         {
-            public Test()
+            private ViewController _viewController;
+            public Test(ViewController viewcontroller)
             {
+                _viewController = viewcontroller;
             }
-            //public override void Scrolled(UIScrollView scrollView)
-            //{
-            //    System.Diagnostics.Debug.WriteLine(scrollView.ContentOffset.X);
-            //    //scrollView.Bounces = false;
-            //}
+
+            public override void Scrolled(UIScrollView scrollView)
+            {
+                System.Diagnostics.Debug.WriteLine(scrollView.ContentOffset.X);
+                //scrollView.Bounces = false;
+                if(_viewController.DockIndex==0)
+                {
+                    if (scrollView.ContentOffset.X < scrollView.Bounds.Width)
+                        scrollView.ContentOffset = new CGPoint(scrollView.Bounds.Width, scrollView.ContentOffset.Y);
+                }
+                else if (_viewController.DockIndex == 3)
+				{
+					if (scrollView.ContentOffset.X > scrollView.Bounds.Width)
+						scrollView.ContentOffset = new CGPoint(scrollView.Bounds.Width, scrollView.ContentOffset.Y);
+				}
+            }
+
+            //there is a bug, prefer to this
+			//https://stackoverflow.com/questions/21798218/disable-uipageviewcontroller-bounce
+			public override void WillEndDragging(UIScrollView scrollView, CGPoint velocity, ref CGPoint targetContentOffset)
+            {
+				if (_viewController.DockIndex == 0)
+				{
+					if (scrollView.ContentOffset.X < scrollView.Bounds.Width)
+						scrollView.ContentOffset = new CGPoint(scrollView.Bounds.Width, scrollView.ContentOffset.Y);
+				}
+				else if (_viewController.DockIndex == 3)
+				{
+					if (scrollView.ContentOffset.X > scrollView.Bounds.Width)
+						scrollView.ContentOffset = new CGPoint(scrollView.Bounds.Width, scrollView.ContentOffset.Y);
+				}
+            }
         }
     }
 }
