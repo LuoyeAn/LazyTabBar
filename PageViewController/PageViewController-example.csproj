@@ -103,15 +103,7 @@
     <Compile Include="ViewControllers\B.cs" />
     <Compile Include="ViewControllers\BaseView.cs" />
     <Compile Include="ViewControllers\C.cs" />
-    <Compile Include="ViewControllers\ContentViewController.cs" />
-    <Compile Include="ViewControllers\ContentViewController.designer.cs">
-      <DependentUpon>ContentViewController.cs</DependentUpon>
-    </Compile>
     <Compile Include="ViewControllers\D.cs" />
-    <Compile Include="ViewControllers\PageViewController.cs" />
-    <Compile Include="ViewControllers\PageViewController.designer.cs">
-      <DependentUpon>PageViewController.cs</DependentUpon>
-    </Compile>
     <Compile Include="ViewControllers\ViewController.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />

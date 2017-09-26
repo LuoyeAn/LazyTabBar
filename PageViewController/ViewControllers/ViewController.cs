@@ -31,6 +31,12 @@ namespace PageViewController.ViewControllers
 
         public ViewController()
         {
+            if (IsIphoneX()) _tabBarHeight += 34;
+        }
+
+        private bool IsIphoneX()
+        {
+            return UIScreen.MainScreen.Bounds.Height == 812;
         }
 
         public override void ViewDidLoad()
@@ -74,6 +80,7 @@ namespace PageViewController.ViewControllers
                     BorderWidth = 0.5f
                 },
                 LayoutParameters = new LayoutParameters(AutoSize.FillParent, AutoSize.FillParent),
+                Padding = new UIEdgeInsets(0, 0, IsIphoneX() ? 34 : 0, 0),
                 SubViews = new View[]
                 {
                     _challengesTabBar= new CustomTabBarItem("settings_challenges","Challenges",()=> {
