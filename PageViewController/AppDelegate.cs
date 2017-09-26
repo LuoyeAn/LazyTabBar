@@ -1,4 +1,5 @@
 ﻿using Foundation;
+using PageViewController.ViewControllers;
 using UIKit;
 
 namespace PageViewController
@@ -17,13 +18,20 @@ namespace PageViewController
 
 		public override bool FinishedLaunching (UIApplication application, NSDictionary launchOptions)
 		{
-			// Override point for customization after application launch.
-			// If not required for your application you can safely delete this method
+            // Override point for customization after application launch.
+            // If not required for your application you can safely delete this method
+
+
+            Window = new UIWindow(UIScreen.MainScreen.Bounds);
+
+            var rootViewController = new UINavigationController(new ViewController());
+            Window.RootViewController = rootViewController;
+            Window.MakeKeyAndVisible();
 
 			var pageController = UIPageControl.Appearance;
 			pageController.PageIndicatorTintColor = UIColor.LightGray; 
 			pageController.CurrentPageIndicatorTintColor = UIColor.Black;
-			pageController.BackgroundColor = UIColor.White;
+			pageController.BackgroundColor = UIColor.Clear;
 			return true;
 		}
 

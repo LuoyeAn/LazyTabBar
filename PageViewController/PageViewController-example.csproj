@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -19,7 +19,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
-    <MtouchArch>i386</MtouchArch>
+    <MtouchArch>i386, x86_64</MtouchArch>
     <MtouchLink>None</MtouchLink>
     <MtouchUseRefCounting>true</MtouchUseRefCounting>
     <MtouchUseSGen>true</MtouchUseSGen>
@@ -79,6 +79,9 @@
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
     <Reference Include="Xamarin.iOS" />
+    <Reference Include="XibFree, Version=1.1.1.2, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\XibFree.1.1.1.2-beta\lib\xamarinios10\XibFree.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ImageAsset Include="Resources\Images.xcassets\AppIcons.appiconset\Contents.json">
@@ -87,36 +90,47 @@
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="Resources\LaunchScreen.xib" />
-    <InterfaceDefinition Include="Main.storyboard" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />
     <None Include="Entitlements.plist" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Main.cs" />
     <Compile Include="AppDelegate.cs" />
+    <Compile Include="ViewControllers\A.cs" />
+    <Compile Include="ViewControllers\B.cs" />
+    <Compile Include="ViewControllers\BaseView.cs" />
+    <Compile Include="ViewControllers\C.cs" />
     <Compile Include="ViewControllers\ContentViewController.cs" />
     <Compile Include="ViewControllers\ContentViewController.designer.cs">
       <DependentUpon>ContentViewController.cs</DependentUpon>
     </Compile>
+    <Compile Include="ViewControllers\D.cs" />
     <Compile Include="ViewControllers\PageViewController.cs" />
     <Compile Include="ViewControllers\PageViewController.designer.cs">
       <DependentUpon>PageViewController.cs</DependentUpon>
     </Compile>
     <Compile Include="ViewControllers\ViewController.cs" />
-    <Compile Include="ViewControllers\ViewController.designer.cs">
-      <DependentUpon>ViewController.cs</DependentUpon>
-    </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
   <ItemGroup>
-    <BundleResource Include="Resources\page1.png" />
-    <BundleResource Include="Resources\page2.png" />
-    <BundleResource Include="Resources\page3.png" />
-    <BundleResource Include="Resources\page4.png" />
+    <BundleResource Include="Resources\trigon%402x.png" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="ViewControllers\" />
+    <BundleResource Include="Resources\settings_activity%402x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\settings_alex%402x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\settings_challenges%402x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\settings_rewards%402x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\threelines%402x.png" />
   </ItemGroup>
 </Project>

@@ -22,10 +22,5 @@ namespace PageViewController.ViewControllers
 			imageView.Image = UIImage.FromBundle(imageFile);
 			label.Text = titleText;
 		}
-
-        public override void ViewWillAppear(bool animated)
-        {
-            base.ViewWillAppear(animated);
-        }
     }
 }
