@@ -47,11 +47,15 @@ namespace PageViewController.ViewControllers
                     {
                         var previousViewController = ViewControllers[_fullySwitchedPage];
                         previousViewController.WillMoveToParentViewController(null);
+                        previousViewController.ViewWillDisappear(true);
+                        previousViewController.ViewDidDisappear(true);
                         previousViewController.RemoveFromParentViewController();
                     }
 
                     var currentViewController = ViewControllers[value];
                     AddChildViewController(currentViewController);
+                    currentViewController.ViewWillAppear(true);
+                    currentViewController.ViewDidAppear(true);
                     currentViewController.DidMoveToParentViewController(this);
                 }
                 _fullySwitchedPage = value;
