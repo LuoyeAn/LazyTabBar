@@ -15,7 +15,7 @@ namespace PageViewController.ViewControllers
 {
     public class ViewController : UIViewController
     {
-        private UIPageViewController pageViewController;
+        private DPageViewController pageViewController;
         private int _tabBarHeight = 70;
 
         private CustomTabBarItem _challengesTabBar;
@@ -48,20 +48,21 @@ namespace PageViewController.ViewControllers
                 viewcontroller.View.Frame=new CGRect(0, 0, this.View.Frame.Width, this.View.Frame.Size.Height+40- _tabBarHeight);
             }
 
-            pageViewController = new UIPageViewController(UIPageViewControllerTransitionStyle.Scroll, UIPageViewControllerNavigationOrientation.Horizontal)
-            {
-                DataSource = new PageViewControllerDataSource(this)
-            };
+            //pageViewController = new UIPageViewController(UIPageViewControllerTransitionStyle.Scroll, UIPageViewControllerNavigationOrientation.Horizontal)
+            //{
+            //    DataSource = new PageViewControllerDataSource(this)
+            //};
+            pageViewController = new DPageViewController(viewControllers.ToList());
 
-            pageViewController.SetViewControllers(new UIViewController[] {viewControllers[0] }, UIPageViewControllerNavigationDirection.Forward, false, null);
+            //pageViewController.SetViewControllers(new UIViewController[] {viewControllers[0] }, UIPageViewControllerNavigationDirection.Forward, false, null);
             pageViewController.View.Frame = new CGRect(0, 0, this.View.Frame.Width, this.View.Frame.Size.Height+40- _tabBarHeight);
           
             
             AddChildViewController(this.pageViewController);
             View.AddSubview(this.pageViewController.View);
             pageViewController.DidMoveToParentViewController(this);
-            pageViewController.DidFinishAnimating += PageViewController_DidFinishAnimating;
-            pageViewController.WillTransition += PageViewController_WillTransition;
+            //pageViewController.DidFinishAnimating += PageViewController_DidFinishAnimating;
+            //pageViewController.WillTransition += PageViewController_WillTransition;
 
             foreach(var view in pageViewController.View.Subviews)
             {
@@ -87,25 +88,26 @@ namespace PageViewController.ViewControllers
                         if(GetIndex()==0)
                             return;
                         DockIndex = 0;
-                        pageViewController.SetViewControllers(new UIViewController[] {viewControllers[0] },GetIndex()>0?UIPageViewControllerNavigationDirection.Reverse:UIPageViewControllerNavigationDirection.Forward, false, null);
+                        //pageViewController.SetViewControllers(new UIViewController[] {viewControllers[0] },GetIndex()>0?UIPageViewControllerNavigationDirection.Reverse:UIPageViewControllerNavigationDirection.Forward, false, null);
                     }),
                     _rewardsTabBar= new CustomTabBarItem("settings_rewards","Rewards",()=> {
                         if(GetIndex()==1)
                             return;
                         DockIndex = 1;
-                        pageViewController.SetViewControllers(new UIViewController[] {viewControllers[1] },GetIndex()>1?UIPageViewControllerNavigationDirection.Reverse:UIPageViewControllerNavigationDirection.Forward, false, null);
+                        //pageViewController.SetViewControllers(new UIViewController[] {viewControllers[1] },GetIndex()>1?UIPageViewControllerNavigationDirection.Reverse:UIPageViewControllerNavigationDirection.Forward, false, null);
                     }),
                     _axtivityTabBar= new CustomTabBarItem("settings_activity","Activity",()=> {
                         if(GetIndex()==2)
                             return;
                         DockIndex = 2;
-                        pageViewController.SetViewControllers(new UIViewController[] {viewControllers[2] },GetIndex()>2?UIPageViewControllerNavigationDirection.Reverse:UIPageViewControllerNavigationDirection.Forward, false, null);
+                        //pageViewController.SetViewControllers(new UIViewController[] {viewControllers[2] },GetIndex()>2?UIPageViewControllerNavigationDirection.Reverse:UIPageViewControllerNavigationDirection.Forward, false, null);
                     }),
                     _moreTabBar= new CustomTabBarItem("threelines","More",()=> {
                         if(GetIndex()==3)
                             return;
                         DockIndex = 3;
-                        pageViewController.SetViewControllers(new UIViewController[] {viewControllers[3] }, GetIndex()>3?UIPageViewControllerNavigationDirection.Reverse:UIPageViewControllerNavigationDirection.Forward, false, null);
+
+                        //pageViewController.SetViewControllers(new UIViewController[] {viewControllers[3] }, GetIndex()>3?UIPageViewControllerNavigationDirection.Reverse:UIPageViewControllerNavigationDirection.Forward, false, null);
                     }),
                 }
             };
@@ -169,13 +171,15 @@ namespace PageViewController.ViewControllers
                     default:
                         break;
                 }
+                pageViewController.CurrentPage = value;
             }
         }
 
         private int GetIndex()
         {
-            nint s = pageViewController.DataSource.GetPresentationIndex(pageViewController);
-            return ((pageViewController.ViewControllers.First() as UINavigationController).ViewControllers[0] as BaseView).pageIndex;
+            return pageViewController.CurrentPage;
+            //nint s = pageViewController.DataSource.GetPresentationIndex(pageViewController);
+            //return ((pageViewController.ViewControllers.First() as UINavigationController).ViewControllers[0] as BaseView).pageIndex;
         }
 
         public UIViewController ViewControllerAtIndex(int index)

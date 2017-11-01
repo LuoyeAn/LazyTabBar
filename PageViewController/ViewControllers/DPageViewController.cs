@@ -51,9 +51,7 @@ namespace PageViewController.ViewControllers
                     }
 
                     var currentViewController = ViewControllers[value];
-                    currentViewController.WillMoveToParentViewController(this);
-                    currentViewController.ViewWillAppear(false);
-                    currentViewController.ViewDidAppear(false);
+                    AddChildViewController(currentViewController);
                     currentViewController.DidMoveToParentViewController(this);
                 }
                 _fullySwitchedPage = value;
@@ -104,11 +102,11 @@ namespace PageViewController.ViewControllers
             for (var i = 0; i < ViewControllers.Count; i++)
             {
                 var page = ViewControllers[i];
-                AddChildViewController(page);
-                //var nextFrame = new CGRect((nfloat)i * View.Bounds.Size.Width, View.Frame.Y, View.Frame.Size.Width, View.Frame.Size.Height); // Origin.Y
-                //page.View.Frame = nextFrame;
+                //AddChildViewController(page);
+                var nextFrame = new CGRect((nfloat)i * View.Bounds.Size.Width, View.Frame.Y, View.Frame.Size.Width, View.Frame.Size.Height); // Origin.Y
+                page.View.Frame = nextFrame;
                 containerScrollView.AddSubview(page.View);
-                page.DidMoveToParentViewController(this);
+                //page.DidMoveToParentViewController(this);
                 //if (i == 0)
                     //page.DidMoveToParentViewController(this);
             }
