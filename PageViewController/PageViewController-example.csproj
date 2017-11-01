@@ -96,6 +96,7 @@
     <Compile Include="ViewControllers\BaseView.cs" />
     <Compile Include="ViewControllers\C.cs" />
     <Compile Include="ViewControllers\D.cs" />
+    <Compile Include="ViewControllers\DPageViewController.cs" />
     <Compile Include="ViewControllers\ViewController.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
