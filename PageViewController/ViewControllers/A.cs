@@ -41,7 +41,7 @@ namespace PageViewController.ViewControllers
         private void Button_TouchUpInside(object sender, EventArgs e)
         {
             var parentViewController = this.ParentViewController;
-            parentViewController.NavigationController.PushViewController(new B(),true);
+            parentViewController.NavigationController.PushViewController(new C(),true);
         }
 
         public override void ViewWillAppear(bool animated)

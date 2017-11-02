@@ -40,5 +40,10 @@ namespace PageViewController.ViewControllers
                 return;
             this.NavigationController.NavigationBarHidden = false;
         }
+
+        public override void WillMoveToParentViewController(UIViewController parent)
+        {
+            base.WillMoveToParentViewController(parent);
+        }
     }
 }

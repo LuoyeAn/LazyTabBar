@@ -36,6 +36,9 @@ namespace PageViewController.ViewControllers
         public override void ViewWillAppear(bool animated)
         {
             base.ViewWillAppear(animated);
+            if (this.NavigationController == null)
+                return;
+            this.NavigationController.NavigationBarHidden = false;
         }
     }
 }

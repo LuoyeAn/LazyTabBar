@@ -23,12 +23,6 @@ namespace PageViewController.ViewControllers
         private CustomTabBarItem _axtivityTabBar;
         private CustomTabBarItem _moreTabBar;
 
-        UIViewController[] viewControllers = new UIViewController[] {
-            new UINavigationController(new A(){ pageIndex=0}),
-            new UINavigationController(new B(){ pageIndex=1}),
-            new UINavigationController(new C(){ pageIndex=2}),
-            new UINavigationController(new D(){ pageIndex=3}) };
-
         public ViewController()
         {
             if (IsIphoneX()) _tabBarHeight += 34;
@@ -43,34 +37,13 @@ namespace PageViewController.ViewControllers
         {
             base.ViewDidLoad();
 
-            foreach(var viewcontroller in viewControllers)
-            {
-                viewcontroller.View.Frame=new CGRect(0, 0, this.View.Frame.Width, this.View.Frame.Size.Height+40- _tabBarHeight);
-            }
 
-            //pageViewController = new UIPageViewController(UIPageViewControllerTransitionStyle.Scroll, UIPageViewControllerNavigationOrientation.Horizontal)
-            //{
-            //    DataSource = new PageViewControllerDataSource(this)
-            //};
-            pageViewController = new DPageViewController(viewControllers.ToList());
-
-            //pageViewController.SetViewControllers(new UIViewController[] {viewControllers[0] }, UIPageViewControllerNavigationDirection.Forward, false, null);
+            pageViewController = new DPageViewController();
             pageViewController.View.Frame = new CGRect(0, 0, this.View.Frame.Width, this.View.Frame.Size.Height+40- _tabBarHeight);
-          
             
             AddChildViewController(this.pageViewController);
             View.AddSubview(this.pageViewController.View);
             pageViewController.DidMoveToParentViewController(this);
-            //pageViewController.DidFinishAnimating += PageViewController_DidFinishAnimating;
-            //pageViewController.WillTransition += PageViewController_WillTransition;
-
-            foreach(var view in pageViewController.View.Subviews)
-            {
-                if(view is UIScrollView scrollview)
-                {
-                    scrollview.Delegate = new Test(this);
-                }
-            }
 
 
             var layout = new LinearLayout(Orientation.Horizontal)
@@ -122,16 +95,6 @@ namespace PageViewController.ViewControllers
         }
 
         int nextVCIndex = 0;
-        private void PageViewController_WillTransition(object sender, UIPageViewControllerTransitionEventArgs e) 
-            => nextVCIndex = ((BaseView)((UINavigationController)e.PendingViewControllers[0]).ViewControllers[0]).pageIndex;
-
-        private void PageViewController_DidFinishAnimating(object sender, UIPageViewFinishedAnimationEventArgs e)
-        {
-            if (!e.Completed)
-                return;
-            if(e.Finished)
-            DockIndex = nextVCIndex;
-        }
 
         private int _dockIndex;
         public int DockIndex
@@ -178,72 +141,12 @@ namespace PageViewController.ViewControllers
         private int GetIndex()
         {
             return pageViewController.CurrentPage;
-            //nint s = pageViewController.DataSource.GetPresentationIndex(pageViewController);
-            //return ((pageViewController.ViewControllers.First() as UINavigationController).ViewControllers[0] as BaseView).pageIndex;
-        }
-
-        public UIViewController ViewControllerAtIndex(int index)
-        {
-            var vc = (viewControllers.ElementAt(index) as UINavigationController).ViewControllers[0] as BaseView;
-            vc.pageIndex = index;
-            return viewControllers.ElementAt(index);
         }
 
         public override void ViewWillAppear(bool animated)
         {
             base.ViewWillAppear(animated);
             this.NavigationController.NavigationBarHidden = true;
-        }
-
-        private class PageViewControllerDataSource : UIPageViewControllerDataSource
-        {
-            private ViewController _parentViewController;
-            
-            public PageViewControllerDataSource(UIViewController parentViewController)
-            {
-                _parentViewController = parentViewController as ViewController;
-            }
-         
-            public override UIViewController GetPreviousViewController(UIPageViewController pageViewController, UIViewController referenceViewController)
-            {
-                var vc = (referenceViewController as UINavigationController).ViewControllers[0] as BaseView;
-                var index = vc.pageIndex;
-                if (index == 0)
-                {
-                    return null;
-                }
-                else
-                {
-                    index--;
-                    return _parentViewController.ViewControllerAtIndex(index);
-                }
-            }
-
-            public override UIViewController GetNextViewController(UIPageViewController pageViewController, UIViewController referenceViewController)
-            {
-                var vc = (referenceViewController as UINavigationController).ViewControllers[0] as BaseView;
-                var index = vc.pageIndex;
-
-                index++;
-                if (index == 4)
-                {
-                    return null;
-                }
-                else
-                {
-                    return _parentViewController.ViewControllerAtIndex(index);
-                }
-            }
-
-            public override nint GetPresentationCount(UIPageViewController pageViewController)
-            {
-                return 4;
-            }
-
-            public override nint GetPresentationIndex(UIPageViewController pageViewController)
-            {
-                return 1;
-            }
         }
 
         class CustomTabBarItem : NativeView
@@ -364,47 +267,6 @@ namespace PageViewController.ViewControllers
                     }
                     View.SetNeedsLayout();
                 }
-            }
-        }
-
-        class Test : UIScrollViewDelegate
-        {
-            private ViewController _viewController;
-            public Test(ViewController viewcontroller)
-            {
-                _viewController = viewcontroller;
-            }
-
-            public override void Scrolled(UIScrollView scrollView)
-            {
-                System.Diagnostics.Debug.WriteLine(scrollView.ContentOffset.X);
-                //scrollView.Bounces = false;
-                if(_viewController.DockIndex==0)
-                {
-                    if (scrollView.ContentOffset.X < scrollView.Bounds.Width)
-                        scrollView.ContentOffset = new CGPoint(scrollView.Bounds.Width, scrollView.ContentOffset.Y);
-                }
-                else if (_viewController.DockIndex == 3)
-				{
-					if (scrollView.ContentOffset.X > scrollView.Bounds.Width)
-						scrollView.ContentOffset = new CGPoint(scrollView.Bounds.Width, scrollView.ContentOffset.Y);
-				}
-            }
-
-            //there is a bug, prefer to this
-			//https://stackoverflow.com/questions/21798218/disable-uipageviewcontroller-bounce
-			public override void WillEndDragging(UIScrollView scrollView, CGPoint velocity, ref CGPoint targetContentOffset)
-            {
-				if (_viewController.DockIndex == 0)
-				{
-					if (scrollView.ContentOffset.X < scrollView.Bounds.Width)
-						scrollView.ContentOffset = new CGPoint(scrollView.Bounds.Width, scrollView.ContentOffset.Y);
-				}
-				else if (_viewController.DockIndex == 3)
-				{
-					if (scrollView.ContentOffset.X > scrollView.Bounds.Width)
-						scrollView.ContentOffset = new CGPoint(scrollView.Bounds.Width, scrollView.ContentOffset.Y);
-				}
             }
         }
     }
