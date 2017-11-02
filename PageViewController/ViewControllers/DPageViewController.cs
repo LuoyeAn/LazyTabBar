@@ -11,7 +11,6 @@ namespace PageViewController.ViewControllers
 {
     public class DPageViewController : UIViewController
     {
-        public bool Left { get; set; }
 
         UIViewController[] viewControllers = new UIViewController[] {
             new UINavigationController(new A(){ pageIndex=0}),
@@ -47,7 +46,6 @@ namespace PageViewController.ViewControllers
             {
                 if (value != _fullySwitchedPage)
                 {
-                    // The page is fully switched.
                     if (_fullySwitchedPage < ViewControllers.Count&&_fullySwitchedPage>0)
                     {
                         var previousViewController = ViewControllers[_fullySwitchedPage];
@@ -55,13 +53,35 @@ namespace PageViewController.ViewControllers
                         previousViewController.RemoveFromParentViewController();
                         previousViewController.View.RemoveFromSuperview();
                     }
+                }
+                _fullySwitchedPage = value;
+            }
+        }
 
-                    var currentViewController = ViewControllers[value];
+        private bool _left;
+        public bool Left
+        {
+            get => _left;
+            set
+            {
+                if (_left == value)
+                    return;
+                _left = value;
+
+                if (value)
+                {
+                    var currentViewController = ViewControllers[CurrentPage + 1];
                     AddChildViewController(currentViewController);
                     containerScrollView.AddSubview(currentViewController.View);
                     currentViewController.DidMoveToParentViewController(this);
                 }
-                _fullySwitchedPage = value;
+                else
+                {
+                    var currentViewController = ViewControllers[CurrentPage - 1];
+                    AddChildViewController(currentViewController);
+                    containerScrollView.AddSubview(currentViewController.View);
+                    currentViewController.DidMoveToParentViewController(this);
+                }
             }
         }
 
@@ -75,6 +95,7 @@ namespace PageViewController.ViewControllers
             base.ViewDidLoad();
 
             containerScrollView = new UIScrollView(new CGRect(0, 0, View.Frame.Size.Width, View.Frame.Size.Height-70)); //frame: self.view.bounds
+            containerScrollView.Bounces = false;
             containerScrollView.PagingEnabled = true;
             containerScrollView.AlwaysBounceVertical = false;
             containerScrollView.AlwaysBounceHorizontal = false; // drag with only one view controller
@@ -89,10 +110,9 @@ namespace PageViewController.ViewControllers
             for (var i = 0; i < ViewControllers.Count; i += 1)
             {
                 var pageX = (nfloat)i * View.Bounds.Size.Width;
-                //ViewControllers[i].View.Frame = new CGRect(pageX, 0.0, View.Bounds.Size.Width, View.Bounds.Size.Height);
+                ViewControllers[i].View.Frame = new CGRect(pageX, 0.0, View.Bounds.Size.Width, View.Bounds.Size.Height-70);
             }
-            // It is important to set the pageWidth property before the contentSize and contentOffset,
-            // in order to use the new width into scrollView delegate methods.
+
             pageWidth = View.Bounds.Size.Width;
             containerScrollView.ContentSize = new CGSize((nfloat)ViewControllers.Count * View.Bounds.Size.Width, View.Frame.Size.Height - 70);
             containerScrollView.ContentOffset = new CGPoint((nfloat)CurrentPage * View.Bounds.Size.Width, 0.0);
@@ -137,6 +157,7 @@ namespace PageViewController.ViewControllers
                 }
             }
         }
+
 
         class Test : UIScrollViewDelegate
         {

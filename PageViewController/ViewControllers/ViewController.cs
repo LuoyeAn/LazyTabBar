@@ -94,7 +94,6 @@ namespace PageViewController.ViewControllers
             DockIndex = 0;
         }
 
-        int nextVCIndex = 0;
 
         private int _dockIndex;
         public int DockIndex
