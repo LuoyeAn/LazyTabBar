@@ -39,7 +39,8 @@ namespace PageViewController.ViewControllers
 
 
             pageViewController = new DPageViewController();
-            pageViewController.View.Frame = new CGRect(0, 0, this.View.Frame.Width, this.View.Frame.Size.Height+40- _tabBarHeight);
+            pageViewController.View.Frame = new CGRect(0, 0, UIScreen.MainScreen.Bounds.Width,
+                UIScreen.MainScreen.Bounds.Height-70);
             
             AddChildViewController(this.pageViewController);
             View.AddSubview(this.pageViewController.View);

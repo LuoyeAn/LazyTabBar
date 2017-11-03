@@ -13,10 +13,10 @@ namespace PageViewController.ViewControllers
     {
 
         UIViewController[] viewControllers = new UIViewController[] {
-            new UINavigationController(new A(){ pageIndex=0}),
-            new UINavigationController(new B(){ pageIndex=1}),
-            new UINavigationController(new C(){ pageIndex=2}),
-            new UINavigationController(new D(){ pageIndex=3}) };
+            new UINavigationController(new A()),
+            new UINavigationController(new B()),
+            new UINavigationController(new C()),
+            new UINavigationController(new D()) };
 
         UIScrollView containerScrollView;
         nfloat pageWidth = UIScreen.MainScreen.Bounds.Width;
@@ -58,10 +58,10 @@ namespace PageViewController.ViewControllers
             }
         }
 
-        private bool _left;
+        private bool? _left;
         public bool Left
         {
-            get => _left;
+            get => _left.Value;
             set
             {
                 if (_left == value)
@@ -70,6 +70,8 @@ namespace PageViewController.ViewControllers
 
                 if (value)
                 {
+                    if (CurrentPage >= ViewControllers.Count)
+                        return;
                     var currentViewController = ViewControllers[CurrentPage + 1];
                     AddChildViewController(currentViewController);
                     containerScrollView.AddSubview(currentViewController.View);
@@ -77,6 +79,8 @@ namespace PageViewController.ViewControllers
                 }
                 else
                 {
+                    if (CurrentPage <= 0)
+                        return;
                     var currentViewController = ViewControllers[CurrentPage - 1];
                     AddChildViewController(currentViewController);
                     containerScrollView.AddSubview(currentViewController.View);
@@ -94,7 +98,7 @@ namespace PageViewController.ViewControllers
         {
             base.ViewDidLoad();
 
-            containerScrollView = new UIScrollView(new CGRect(0, 0, View.Frame.Size.Width, View.Frame.Size.Height-70)); //frame: self.view.bounds
+            containerScrollView = new UIScrollView(new CGRect(0, 0, View.Frame.Size.Width, View.Frame.Size.Height)); //frame: self.view.bounds
             containerScrollView.Bounces = false;
             containerScrollView.PagingEnabled = true;
             containerScrollView.AlwaysBounceVertical = false;
@@ -107,14 +111,16 @@ namespace PageViewController.ViewControllers
 
         public override void ViewDidLayoutSubviews()
         {
-            for (var i = 0; i < ViewControllers.Count; i += 1)
-            {
-                var pageX = (nfloat)i * View.Bounds.Size.Width;
-                ViewControllers[i].View.Frame = new CGRect(pageX, 0.0, View.Bounds.Size.Width, View.Bounds.Size.Height-70);
-            }
+            //for (var i = 0; i < ViewControllers.Count; i += 1)
+            //{
+            //    var pageX = (nfloat)i * View.Bounds.Size.Width;
+            //    ViewControllers[i].View.Frame = new CGRect(pageX, 0.0, View.Bounds.Size.Width, View.Bounds.Size.Height);
+            //}
 
-            pageWidth = View.Bounds.Size.Width;
-            containerScrollView.ContentSize = new CGSize((nfloat)ViewControllers.Count * View.Bounds.Size.Width, View.Frame.Size.Height - 70);
+            //pageWidth = View.Bounds.Size.Width;
+            //containerScrollView.ContentSize = new CGSize((nfloat)ViewControllers.Count * View.Bounds.Size.Width, View.Frame.Size.Height);
+            //containerScrollView.ContentOffset = new CGPoint((nfloat)CurrentPage * View.Bounds.Size.Width, 0.0);
+            LayoutPages();
             containerScrollView.ContentOffset = new CGPoint((nfloat)CurrentPage * View.Bounds.Size.Width, 0.0);
         }
 
@@ -137,7 +143,7 @@ namespace PageViewController.ViewControllers
                 page.View.Frame = nextFrame;
             }
 
-            containerScrollView.ContentSize = new CGSize(View.Bounds.Size.Width * (nfloat)ViewControllers.Count, View.Frame.Size.Height - 70);
+            containerScrollView.ContentSize = new CGSize(View.Bounds.Size.Width * (nfloat)ViewControllers.Count, View.Frame.Size.Height);
         }
         public void InsertPage(UIViewController viewController, int index)
         {

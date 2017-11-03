@@ -9,7 +9,7 @@ namespace PageViewController.ViewControllers
 {
 
     [Register("D")]
-    public class D : BaseView
+    public class D : UIViewController
     {
         public D()
         {
@@ -31,6 +31,7 @@ namespace PageViewController.ViewControllers
             // Perform any additional setup after loading the view
             Title = "D";
             View.BackgroundColor = UIColor.Green;
+            this.NavigationController.NavigationBarHidden = true;
         }
 
         public override void ViewWillAppear(bool animated)

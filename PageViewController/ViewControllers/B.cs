@@ -9,7 +9,7 @@ namespace PageViewController.ViewControllers
 {
 
     [Register("B")]
-    public class B : BaseView
+    public class B : UIViewController
     {
         public B()
         {

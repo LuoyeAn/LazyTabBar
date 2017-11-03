@@ -8,7 +8,7 @@ using Foundation;
 namespace PageViewController.ViewControllers
 {
     [Register("A")]
-    public class A : BaseView
+    public class A : UIViewController
     {
         public A()
         {
