@@ -11,6 +11,21 @@ namespace PageViewController.ViewControllers
 {
     public class DPageViewController : UIViewController
     {
+        double width = UIScreen.MainScreen.Bounds.Width;
+        private double height
+        {
+            get
+            {
+                if(IsIphoneX())
+                    return UIScreen.MainScreen.Bounds.Height - 104;
+                return UIScreen.MainScreen.Bounds.Height - 70;
+            }
+        }
+
+        private bool IsIphoneX()
+        {
+            return UIScreen.MainScreen.Bounds.Height == 812;
+        }
 
         UIViewController[] viewControllers = new UIViewController[] {
             new UINavigationController(new A()),
@@ -22,46 +37,42 @@ namespace PageViewController.ViewControllers
         nfloat pageWidth = UIScreen.MainScreen.Bounds.Width;
         public List<UIViewController> ViewControllers;
 
+        public int LastPage { get; set; }
+
         int _currentPage=-1;
         public int CurrentPage
         {
             get=> _currentPage; 
             set
             {
+                if (_currentPage == value)
+                    return;
+                LastPage = _currentPage;
                 _currentPage = value;
                 System.Diagnostics.Debug.WriteLine($"currentPage:{value}");
                 if (_currentPage >= ViewControllers.Count)
                 {
                     _currentPage = ViewControllers.Count - 1;
                 }
-                FullySwitchedPage = CurrentPage;
-            }
-        }
 
-        int _fullySwitchedPage=-1;
-        public int FullySwitchedPage
-        {
-            get=> _fullySwitchedPage; 
-            set
-            {
-                if (value != _fullySwitchedPage)
+                if (_currentPage < ViewControllers.Count && _currentPage > 0)
                 {
-                    if (_fullySwitchedPage < ViewControllers.Count&&_fullySwitchedPage>0)
-                    {
-                        var previousViewController = ViewControllers[_fullySwitchedPage];
-                        previousViewController.WillMoveToParentViewController(null);
-                        previousViewController.RemoveFromParentViewController();
-                        previousViewController.View.RemoveFromSuperview();
-                    }
+                    var previousViewController = ViewControllers[LastPage];
+                    previousViewController.WillMoveToParentViewController(null);
+                    previousViewController.RemoveFromParentViewController();
+                    previousViewController.View.RemoveFromSuperview();
                 }
-                _fullySwitchedPage = value;
+                var currentViewController = ViewControllers[_currentPage];
+                AddChildViewController(currentViewController);
+                containerScrollView.AddSubview(currentViewController.View);
+                currentViewController.DidMoveToParentViewController(this);
             }
         }
 
-        private bool? _left;
-        public bool Left
+        private bool _left;
+        public bool MoveToLeft
         {
-            get => _left.Value;
+            get => _left;
             set
             {
                 if (_left == value)
@@ -98,7 +109,7 @@ namespace PageViewController.ViewControllers
         {
             base.ViewDidLoad();
 
-            containerScrollView = new UIScrollView(new CGRect(0, 0, View.Frame.Size.Width, View.Frame.Size.Height)); //frame: self.view.bounds
+            containerScrollView = new UIScrollView(new CGRect(0, 0, width, height)); //frame: self.view.bounds
             containerScrollView.Bounces = false;
             containerScrollView.PagingEnabled = true;
             containerScrollView.AlwaysBounceVertical = false;
@@ -106,27 +117,8 @@ namespace PageViewController.ViewControllers
             containerScrollView.ShowsHorizontalScrollIndicator = false;
             containerScrollView.Delegate = new Test(this);
             View.AddSubview(containerScrollView);
+
             LayoutPages();
-        }
-
-        public override void ViewDidLayoutSubviews()
-        {
-            //for (var i = 0; i < ViewControllers.Count; i += 1)
-            //{
-            //    var pageX = (nfloat)i * View.Bounds.Size.Width;
-            //    ViewControllers[i].View.Frame = new CGRect(pageX, 0.0, View.Bounds.Size.Width, View.Bounds.Size.Height);
-            //}
-
-            //pageWidth = View.Bounds.Size.Width;
-            //containerScrollView.ContentSize = new CGSize((nfloat)ViewControllers.Count * View.Bounds.Size.Width, View.Frame.Size.Height);
-            //containerScrollView.ContentOffset = new CGPoint((nfloat)CurrentPage * View.Bounds.Size.Width, 0.0);
-            LayoutPages();
-            containerScrollView.ContentOffset = new CGPoint((nfloat)CurrentPage * View.Bounds.Size.Width, 0.0);
-        }
-
-        public override void WillMoveToParentViewController(UIViewController parent)
-        {
-            CurrentPage = 0;
         }
 
         void LayoutPages()
@@ -139,33 +131,15 @@ namespace PageViewController.ViewControllers
             for (var i = 0; i < ViewControllers.Count; i++)
             {
                 var page = ViewControllers[i];
-                var nextFrame = new CGRect((nfloat)i * View.Bounds.Size.Width, View.Frame.Y, View.Frame.Size.Width, View.Frame.Size.Height); // Origin.Y
+                var nextFrame = new CGRect((nfloat)i * width, 0, width, height); // Origin.Y
+                System.Diagnostics.Debug.WriteLine(nextFrame);
                 page.View.Frame = nextFrame;
             }
-
-            containerScrollView.ContentSize = new CGSize(View.Bounds.Size.Width * (nfloat)ViewControllers.Count, View.Frame.Size.Height);
-        }
-        public void InsertPage(UIViewController viewController, int index)
-        {
-            ViewControllers.Insert(index, viewController);
-            LayoutPages();
-            CurrentPage = index;
+            containerScrollView.Frame = new CGRect(0, 0, width, height); //frame: self.view.bounds
+            containerScrollView.ContentSize = new CGSize(width * (nfloat)ViewControllers.Count, height);
         }
 
-        public void RemovePage(UIViewController viewController)
-        {
-            for (var i = 0; i < ViewControllers.Count; i += 1)
-            {
-                if (ViewControllers[i] == viewController)
-                {
-                    ViewControllers.RemoveAt(i);
-                    LayoutPages();
-                }
-            }
-        }
-
-
-        class Test : UIScrollViewDelegate
+        private class Test : UIScrollViewDelegate
         {
             private DPageViewController _viewController;
             private nfloat pageWidth;
@@ -174,28 +148,24 @@ namespace PageViewController.ViewControllers
                 _viewController = viewcontroller;
                 pageWidth = viewcontroller.pageWidth;
             }
-
+            double offset = 0;
             public override void Scrolled(UIScrollView scrollView)
             {
-                double t = _viewController.containerScrollView.ContentOffset.X / pageWidth;
+                bool moveToLeft = scrollView.ContentOffset.X - offset > 0;
+                offset = scrollView.ContentOffset.X;
+                double t = offset / pageWidth;
                 int page = (int)Math.Round(t);
-                bool left = t - page > 0;
 
                 if (_viewController.CurrentPage != (int)page)
                 {
                     if (page >= 0 && (int)page < _viewController.ViewControllers.Count)
                     {
                         _viewController.CurrentPage = page;
+                        System.Diagnostics.Debug.WriteLine($"offset:{scrollView.ContentOffset.X} , scrolledPage:{page} ,moveToLeft:{moveToLeft}");
                     }
                 }
 
-                if ((int)_viewController.containerScrollView.ContentOffset.X % (int)pageWidth == 0)
-                {
-                    _viewController.CurrentPage = (int)page;
-                }
-                System.Diagnostics.Debug.WriteLine($"offset:{scrollView.ContentOffset.X} , scrolledPage:{page} ,left:{left}");
-
-                _viewController.Left = left;
+                //_viewController.MoveToLeft = moveToLeft;
             }
 
             public override void ScrollAnimationEnded(UIScrollView scrollView)

@@ -35,10 +35,12 @@ namespace PageViewController.ViewControllers
 
         public override void ViewWillAppear(bool animated)
         {
+            System.Diagnostics.Debug.WriteLine($"ViewWillAppear{Title}");
             base.ViewWillAppear(animated);
             if (this.NavigationController == null)
                 return;
             this.NavigationController.NavigationBarHidden = false;
+
         }
 
         public override void WillMoveToParentViewController(UIViewController parent)

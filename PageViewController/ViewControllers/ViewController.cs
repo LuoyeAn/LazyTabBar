@@ -16,7 +16,16 @@ namespace PageViewController.ViewControllers
     public class ViewController : UIViewController
     {
         private DPageViewController pageViewController;
-        private int _tabBarHeight = 70;
+
+        private int TabBarHeight
+        {
+            get
+            {
+                if (IsIphoneX())
+                    return 104;
+                return 70;
+            }
+        }
 
         private CustomTabBarItem _challengesTabBar;
         private CustomTabBarItem _rewardsTabBar;
@@ -25,7 +34,6 @@ namespace PageViewController.ViewControllers
 
         public ViewController()
         {
-            if (IsIphoneX()) _tabBarHeight += 34;
         }
 
         private bool IsIphoneX()
@@ -40,7 +48,7 @@ namespace PageViewController.ViewControllers
 
             pageViewController = new DPageViewController();
             pageViewController.View.Frame = new CGRect(0, 0, UIScreen.MainScreen.Bounds.Width,
-                UIScreen.MainScreen.Bounds.Height-70);
+                UIScreen.MainScreen.Bounds.Height-TabBarHeight);
             
             AddChildViewController(this.pageViewController);
             View.AddSubview(this.pageViewController.View);
@@ -87,7 +95,7 @@ namespace PageViewController.ViewControllers
             };
 
             var customTabbar = new UILayoutHost(layout, new CGRect(
-                0, UIScreen.MainScreen.Bounds.Height - _tabBarHeight, UIScreen.MainScreen.Bounds.Width, _tabBarHeight))
+                0, UIScreen.MainScreen.Bounds.Height - TabBarHeight, UIScreen.MainScreen.Bounds.Width, TabBarHeight))
             { BackgroundColor = UIColor.White };
             this.View.Add(customTabbar);
             View.BackgroundColor = UIColor.White;
@@ -134,7 +142,7 @@ namespace PageViewController.ViewControllers
                     default:
                         break;
                 }
-                pageViewController.CurrentPage = value;
+                //pageViewController.CurrentPage = value;
             }
         }
 
