@@ -38,7 +38,15 @@ namespace PageViewController.ViewControllers
         UIScrollView containerScrollView;
         public List<UIViewController> ViewControllers;
 
-        public int LastPage { get; set; }
+        private int _otherPage;
+        public int OtherPage
+        {
+            get => _otherPage;
+            set
+            {
+                _otherPage = value;
+            }
+        }
 
         int _currentPage=-1;
         public int CurrentPage
@@ -48,7 +56,6 @@ namespace PageViewController.ViewControllers
             {
                 if (_currentPage == value)
                     return;
-                LastPage = _currentPage;
                 _currentPage = value;
                 System.Diagnostics.Debug.WriteLine($"currentPage:{value}");
                 if (_currentPage >= ViewControllers.Count)
@@ -58,7 +65,7 @@ namespace PageViewController.ViewControllers
 
                 if (_currentPage < ViewControllers.Count && _currentPage > 0)
                 {
-                    var previousViewController = ViewControllers[LastPage];
+                    var previousViewController = ViewControllers[OtherPage];
                     previousViewController.WillMoveToParentViewController(null);
                     previousViewController.RemoveFromParentViewController();
                     previousViewController.View.RemoveFromSuperview();
@@ -70,34 +77,36 @@ namespace PageViewController.ViewControllers
             }
         }
 
-        private bool _left;
-        public bool MoveToLeft
+        private bool _movingToCurrentPage;
+        public bool MovingToCurrentPage
         {
-            get => _left;
+            get => _movingToCurrentPage;
             set
             {
-                if (_left == value)
+                if (_movingToCurrentPage == value)
                     return;
-                _left = value;
+                _movingToCurrentPage = value;
 
-                if (value)
-                {
-                    if (CurrentPage >= ViewControllers.Count)
-                        return;
-                    var currentViewController = ViewControllers[CurrentPage + 1];
-                    AddChildViewController(currentViewController);
-                    containerScrollView.AddSubview(currentViewController.View);
-                    currentViewController.DidMoveToParentViewController(this);
-                }
-                else
-                {
-                    if (CurrentPage <= 0)
-                        return;
-                    var currentViewController = ViewControllers[CurrentPage - 1];
-                    AddChildViewController(currentViewController);
-                    containerScrollView.AddSubview(currentViewController.View);
-                    currentViewController.DidMoveToParentViewController(this);
-                }
+                System.Diagnostics.Debug.WriteLine($"MovingToCurrent:{value},CurrentPage:{CurrentPage},OtherPage:{OtherPage}");
+
+                //if (value)
+                //{
+                //    if (CurrentPage >= ViewControllers.Count)
+                //        return;
+                //    var currentViewController = ViewControllers[CurrentPage + 1];
+                //    AddChildViewController(currentViewController);
+                //    containerScrollView.AddSubview(currentViewController.View);
+                //    currentViewController.DidMoveToParentViewController(this);
+                //}
+                //else
+                //{
+                //    if (CurrentPage <= 0)
+                //        return;
+                //    var currentViewController = ViewControllers[CurrentPage - 1];
+                //    AddChildViewController(currentViewController);
+                //    containerScrollView.AddSubview(currentViewController.View);
+                //    currentViewController.DidMoveToParentViewController(this);
+                //}
             }
         }
 
@@ -163,10 +172,11 @@ namespace PageViewController.ViewControllers
                 _viewController = viewcontroller;
                 pageWidth = viewcontroller.width;
             }
-            double offset = 0;
+
+            nfloat offset = 0;
             public override void Scrolled(UIScrollView scrollView)
             {
-                bool moveToLeft = scrollView.ContentOffset.X - offset > 0;
+                var moveToLeft = offset - scrollView.ContentOffset.X < 0;
                 offset = scrollView.ContentOffset.X;
                 double t = offset / pageWidth;
                 int page = (int)Math.Round(t);
@@ -180,7 +190,15 @@ namespace PageViewController.ViewControllers
                     }
                 }
 
-                //_viewController.MoveToLeft = moveToLeft;
+                if (t-page>0)
+                    _viewController.OtherPage = _viewController.CurrentPage + 1;
+                else
+                    _viewController.OtherPage = _viewController.CurrentPage - 1;
+
+
+                var result = _viewController.CurrentPage * pageWidth - offset;
+
+                _viewController.MovingToCurrentPage = moveToLeft&&(result>=0)||(!moveToLeft)&&(result<0);
             }
 
             public override void ScrollAnimationEnded(UIScrollView scrollView)
