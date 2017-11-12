@@ -31,14 +31,13 @@ namespace PageViewController.ViewControllers
             // Perform any additional setup after loading the view
             Title = "D";
             View.BackgroundColor = UIColor.Green;
-            this.NavigationController.NavigationBarHidden = true;
         }
 
         public override void ViewWillAppear(bool animated)
         {
             base.ViewWillAppear(animated);
             System.Diagnostics.Debug.WriteLine($"ViewWillAppear{Title}");
-            this.NavigationController.NavigationBarHidden = false;
+            this.NavigationController.NavigationBarHidden = true;
         }
     }
 }

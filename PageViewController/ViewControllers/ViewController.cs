@@ -55,14 +55,14 @@ namespace PageViewController.ViewControllers
             pageViewController.DidMoveToParentViewController(this);
 
 
-            var layout = new LinearLayout(Orientation.Horizontal)
+            var tabbarLayout = new LinearLayout(Orientation.Horizontal)
             {
                 Layer = new CoreAnimation.CALayer
                 {
                     BorderColor = UIColor.Gray.CGColor,
                     BorderWidth = 0.5f
                 },
-                LayoutParameters = new LayoutParameters(AutoSize.FillParent, AutoSize.FillParent),
+                LayoutParameters = new LayoutParameters(AutoSize.FillParent, TabBarHeight),
                 Padding = new UIEdgeInsets(0, 0, IsIphoneX() ? 34 : 0, 0),
                 SubViews = new View[]
                 {
@@ -94,11 +94,21 @@ namespace PageViewController.ViewControllers
                 }
             };
 
-            var customTabbar = new UILayoutHost(layout, new CGRect(
-                0, UIScreen.MainScreen.Bounds.Height - TabBarHeight, UIScreen.MainScreen.Bounds.Width, TabBarHeight))
-            { BackgroundColor = UIColor.White };
-            this.View.Add(customTabbar);
-            View.BackgroundColor = UIColor.White;
+
+            var layout = new LinearLayout(Orientation.Vertical)
+            {
+                SubViews = new View[]
+                {
+                    new NativeView
+                    {
+                        View=this.pageViewController.View,
+                        LayoutParameters=new LayoutParameters(AutoSize.FillParent,AutoSize.FillParent)
+                    },
+                    tabbarLayout
+                }
+            };
+
+            this.View = new UILayoutHost(layout){BackgroundColor=UIColor.White};
 
             DockIndex = 0;
         }

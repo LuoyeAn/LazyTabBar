@@ -6,19 +6,21 @@ using System.Text;
 using Foundation;
 using UIKit;
 using CoreGraphics;
+using XibFree;
 
 namespace PageViewController.ViewControllers
 {
     public class DPageViewController : UIViewController
     {
-        double width = UIScreen.MainScreen.Bounds.Width;
-        private double height
+        nfloat width = UIScreen.MainScreen.Bounds.Width;
+        private nfloat height
         {
             get
             {
                 if(IsIphoneX())
-                    return UIScreen.MainScreen.Bounds.Height - 104;
-                return UIScreen.MainScreen.Bounds.Height - 70;
+                    return UIScreen.MainScreen.Bounds.Height - 104-20;
+                return UIScreen.MainScreen.Bounds.Height - 70-20;
+                return View.Bounds.Height-70;
             }
         }
 
@@ -34,7 +36,6 @@ namespace PageViewController.ViewControllers
             new UINavigationController(new D()) };
 
         UIScrollView containerScrollView;
-        nfloat pageWidth = UIScreen.MainScreen.Bounds.Width;
         public List<UIViewController> ViewControllers;
 
         public int LastPage { get; set; }
@@ -109,14 +110,28 @@ namespace PageViewController.ViewControllers
         {
             base.ViewDidLoad();
 
-            containerScrollView = new UIScrollView(new CGRect(0, 0, width, height)); //frame: self.view.bounds
-            containerScrollView.Bounces = false;
-            containerScrollView.PagingEnabled = true;
-            containerScrollView.AlwaysBounceVertical = false;
-            containerScrollView.AlwaysBounceHorizontal = false; // drag with only one view controller
-            containerScrollView.ShowsHorizontalScrollIndicator = false;
-            containerScrollView.Delegate = new Test(this);
-            View.AddSubview(containerScrollView);
+            var layout = new LinearLayout()
+            {
+                SubViews=new View[]
+                {
+                    new NativeView
+                    {
+                        View=containerScrollView=new UIScrollView(),
+                        LayoutParameters=new LayoutParameters(AutoSize.FillParent,AutoSize.FillParent),
+                        Init=view=>
+                        {
+                            containerScrollView.Bounces = false;
+                            containerScrollView.PagingEnabled = true;
+                            containerScrollView.AlwaysBounceVertical = false;
+                            containerScrollView.AlwaysBounceHorizontal = false; // drag with only one view controller
+                            containerScrollView.ShowsHorizontalScrollIndicator = false;
+                            containerScrollView.Delegate = new Test(this);
+                        }
+                    }
+                }
+            };
+
+            this.View = new UILayoutHost(layout);
 
             LayoutPages();
         }
@@ -146,7 +161,7 @@ namespace PageViewController.ViewControllers
             public Test(DPageViewController viewcontroller)
             {
                 _viewController = viewcontroller;
-                pageWidth = viewcontroller.pageWidth;
+                pageWidth = viewcontroller.width;
             }
             double offset = 0;
             public override void Scrolled(UIScrollView scrollView)
