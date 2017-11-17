@@ -43,6 +43,12 @@ namespace PageViewController.ViewControllers
 
         }
 
+        public override void ViewWillDisappear(bool animated)
+        {
+            System.Diagnostics.Debug.WriteLine($"ViewWillDisappear{Title}");
+            base.ViewWillDisappear(animated);
+        }
+
         public override void WillMoveToParentViewController(UIViewController parent)
         {
             base.WillMoveToParentViewController(parent);

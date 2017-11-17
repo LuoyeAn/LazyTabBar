@@ -48,8 +48,16 @@ namespace PageViewController.ViewControllers
         {
             System.Diagnostics.Debug.WriteLine($"ViewWillAppear{Title}");
             base.ViewWillAppear(animated);
-
+            if (this.NavigationController == null)
+                return;
             this.NavigationController.NavigationBarHidden = false;
+
+        }
+
+        public override void ViewWillDisappear(bool animated)
+        {
+            System.Diagnostics.Debug.WriteLine($"ViewWillDisappear{Title}");
+            base.ViewWillDisappear(animated);
         }
     }
 }
