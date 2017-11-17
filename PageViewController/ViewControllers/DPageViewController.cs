@@ -147,19 +147,19 @@ namespace PageViewController.ViewControllers
         public DPageViewController()
         {
             ViewControllers = new List<UIViewController>();
-            //ViewControllers.Add(new UINavigationController(InitTabControllers(0)));
-            //ViewControllers.Add(new UINavigationController(InitTabControllers(1)));
-            //ViewControllers.Add(new UINavigationController(InitTabControllers(2)));
-            //ViewControllers.Add(new UINavigationController(InitTabControllers(3)));
             ViewControllers.Add(null);
             ViewControllers.Add(null);
             ViewControllers.Add(null);
             ViewControllers.Add(null);
         }
 
+        public bool DisabledScorlledDelegate { get; set; }
+
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
+
+            DisabledScorlledDelegate = true;
 
             var tabbarLayout = new LinearLayout(Orientation.Horizontal)
             {
@@ -211,7 +211,6 @@ namespace PageViewController.ViewControllers
 
             this.View = new UILayoutHost(layout) { BackgroundColor = UIColor.White };
 
-
             LayoutPages();
         }
 
@@ -219,6 +218,15 @@ namespace PageViewController.ViewControllers
         {
             base.ViewWillAppear(animated);
             this.NavigationController.NavigationBarHidden = true;
+        }
+
+        public override void ViewDidLayoutSubviews()
+        {
+            base.ViewDidLayoutSubviews();
+
+            DisabledScorlledDelegate = false;
+            CurrentIndex = 2;
+            //containerScrollView.ContentOffset = new CGPoint();
         }
 
         void LayoutPages()
@@ -374,6 +382,8 @@ namespace PageViewController.ViewControllers
             nfloat offset = 0;
             public override void Scrolled(UIScrollView scrollView)
             {
+                if (_viewController.DisabledScorlledDelegate)
+                    return;
                 var moveToLeft = offset - scrollView.ContentOffset.X < 0;
                 offset = scrollView.ContentOffset.X;
                 double t = offset / pageWidth;
