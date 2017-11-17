@@ -158,7 +158,7 @@ namespace PageViewController.ViewControllers
 
         private int GetIndex()
         {
-            return pageViewController.CurrentPage;
+            return pageViewController.CurrentIndex;
         }
 
         public override void ViewWillAppear(bool animated)

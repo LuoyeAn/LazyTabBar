@@ -39,7 +39,7 @@ namespace PageViewController.ViewControllers
             base.ViewWillAppear(animated);
             if (this.NavigationController == null)
                 return;
-            this.NavigationController.NavigationBarHidden = false;
+            this.NavigationController.NavigationBarHidden = true;
 
         }
 

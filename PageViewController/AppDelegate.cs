@@ -24,7 +24,7 @@ namespace PageViewController
 
             Window = new UIWindow(UIScreen.MainScreen.Bounds);
 
-            var rootViewController = new UINavigationController(new ViewController());
+            var rootViewController = new UINavigationController(new DPageViewController());
             Window.RootViewController = rootViewController;
             Window.MakeKeyAndVisible();
 
