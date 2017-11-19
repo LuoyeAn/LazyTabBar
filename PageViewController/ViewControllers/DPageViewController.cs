@@ -12,10 +12,7 @@ namespace PageViewController.ViewControllers
 {
     public class DPageViewController : UIViewController
     {
-        private CustomTabBarItem _challengesTabBar;
-        private CustomTabBarItem _rewardsTabBar;
-        private CustomTabBarItem _axtivityTabBar;
-        private CustomTabBarItem _moreTabBar;
+        List<CustomTabBarItem> TabBarList;
 
         private int TabBarHeight
         {
@@ -78,23 +75,48 @@ namespace PageViewController.ViewControllers
             {
                 if (_currentIndex == value)
                     return;
-                _currentIndex = value;
+                
                 //System.Diagnostics.Debug.WriteLine($"currentPage:{value}");
-                if (_currentIndex >= ViewControllers.Count)
+                if (value >= ViewControllers.Count)
                 {
-                    _currentIndex = ViewControllers.Count - 1;
+                    value = ViewControllers.Count - 1;
                 }
 
-                var currentPage = ViewControllers[_currentIndex];
+                var currentPage = ViewControllers[value];
                 if (currentPage == null)
                 {
-                    currentPage = new UINavigationController(InitTabControllers(_currentIndex));
-                    currentPage.View.Frame = new CGRect((nfloat)_currentIndex * width, 0, width, height);
-                    ViewControllers[_currentIndex] = currentPage;
+                    currentPage = new UINavigationController(InitTabControllers(value));
+                    currentPage.View.Frame = new CGRect((nfloat)value * width, 0, width, height);
+                    ViewControllers[value] = currentPage;
                 }
                 AddChildViewController(currentPage);
                 containerScrollView.AddSubview(currentPage.View);
                 currentPage.DidMoveToParentViewController(this);
+
+                if(DisabledScorlledDelegate)
+                {
+                    containerScrollView.ContentOffset = new CGPoint((nfloat)value * width,0);
+                    DisabledScorlledDelegate = false;
+
+                    if(_currentIndex>=0)
+                    {
+                        var otherPage = ViewControllers[_currentIndex];
+                        otherPage?.WillMoveToParentViewController(null);
+                        otherPage?.RemoveFromParentViewController();
+                        otherPage?.View.RemoveFromSuperview();
+                    }
+                }
+                for (var i = 0; i < 4; i++)
+                {
+                    if (i == value)
+                        TabBarList[i].Selected = true;
+                    else
+                        TabBarList[i].Selected = false;
+                }
+
+
+
+                _currentIndex = value;
             }
         }
 
@@ -151,6 +173,8 @@ namespace PageViewController.ViewControllers
             ViewControllers.Add(null);
             ViewControllers.Add(null);
             ViewControllers.Add(null);
+
+            TabBarList = new List<CustomTabBarItem>();
         }
 
         public bool DisabledScorlledDelegate { get; set; }
@@ -169,22 +193,19 @@ namespace PageViewController.ViewControllers
                     BorderWidth = 0.5f
                 },
                 LayoutParameters = new LayoutParameters(AutoSize.FillParent, TabBarHeight),
-                Padding = new UIEdgeInsets(0, 0, IsIphoneX() ? 34 : 0, 0),
-                SubViews = new View[]
-                {
-                    _challengesTabBar= new CustomTabBarItem("settings_challenges","Challenges",()=> {
-                    }),
-                    _rewardsTabBar= new CustomTabBarItem("settings_rewards","Rewards",()=> {
-
-                    }),
-                    _axtivityTabBar= new CustomTabBarItem("settings_activity","Activity",()=> {
-
-                    }),
-                    _moreTabBar= new CustomTabBarItem("threelines","More",()=> {
-
-                    }),
-                }
+                Padding = new UIEdgeInsets(0, 0, IsIphoneX() ? 34 : 0, 0)
             };
+
+            for (var i = 0; i < 4;i++)
+            {
+                var tabBar = new CustomTabBarItem("settings_challenges", "Challenges", (index) =>
+                {
+                    DisabledScorlledDelegate = true;
+                    CurrentIndex = index;
+                },i);
+                TabBarList.Add(tabBar);
+                tabbarLayout.AddSubView(tabBar);
+            }
 
 
             var layout = new LinearLayout(Orientation.Vertical)
@@ -224,9 +245,7 @@ namespace PageViewController.ViewControllers
         {
             base.ViewDidLayoutSubviews();
 
-            DisabledScorlledDelegate = false;
             CurrentIndex = 2;
-            //containerScrollView.ContentOffset = new CGPoint();
         }
 
         void LayoutPages()
@@ -254,9 +273,11 @@ namespace PageViewController.ViewControllers
             private UIImageView _image;
             private UILabel _titleLabel;
             private string _imageName;
-            public CustomTabBarItem(string imageName, string title, Action action)
+            private int _index;
+            public CustomTabBarItem(string imageName, string title, Action<int> action,int index)
             {
                 _imageName = imageName;
+                _index = index;
                 View = new UILayoutHost(new LinearLayout(Orientation.Vertical)
                 {
                     LayoutParameters = new LayoutParameters(AutoSize.FillParent, AutoSize.FillParent),
@@ -339,7 +360,8 @@ namespace PageViewController.ViewControllers
                     uiView.AddGestureRecognizer(gesture);
                     gesture.AddTarget(() =>
                     {
-                        action?.Invoke();
+                        action?.Invoke(_index);
+                        Selected = true;
                     });
                 };
             }
@@ -384,6 +406,7 @@ namespace PageViewController.ViewControllers
             {
                 if (_viewController.DisabledScorlledDelegate)
                     return;
+                System.Diagnostics.Debug.WriteLine("Scrollview"+DateTime.Now.ToString());
                 var moveToLeft = offset - scrollView.ContentOffset.X < 0;
                 offset = scrollView.ContentOffset.X;
                 double t = offset / pageWidth;
