@@ -7,6 +7,7 @@ using Foundation;
 using UIKit;
 using CoreGraphics;
 using XibFree;
+using MvvmCross.Platform.iOS.Platform;
 
 namespace PageViewController.ViewControllers
 {
@@ -29,9 +30,7 @@ namespace PageViewController.ViewControllers
         {
             get
             {
-                if (IsIphoneX())
-                    return UIScreen.MainScreen.Bounds.Height - TabBarHeight - 40;
-                return UIScreen.MainScreen.Bounds.Height - TabBarHeight - 20;
+                return UIScreen.MainScreen.Bounds.Height - TabBarHeight ;
             }
         }
 
@@ -76,7 +75,6 @@ namespace PageViewController.ViewControllers
                 if (_currentIndex == value)
                     return;
                 
-                //System.Diagnostics.Debug.WriteLine($"currentPage:{value}");
                 if (value >= ViewControllers.Count)
                 {
                     value = ViewControllers.Count - 1;
@@ -113,8 +111,6 @@ namespace PageViewController.ViewControllers
                     else
                         TabBarList[i].Selected = false;
                 }
-
-
 
                 _currentIndex = value;
             }
@@ -161,18 +157,18 @@ namespace PageViewController.ViewControllers
                         currentPage.DidMoveToParentViewController(this);
                     }
                 }
-
-                //System.Diagnostics.Debug.WriteLine($"MovingToCurrent:{value},CurrentPage:{CurrentPage},OtherPage:{OtherPage}");
             }
         }
 
         public DPageViewController()
         {
-            ViewControllers = new List<UIViewController>();
-            ViewControllers.Add(null);
-            ViewControllers.Add(null);
-            ViewControllers.Add(null);
-            ViewControllers.Add(null);
+            ViewControllers = new List<UIViewController>
+            {
+                null,
+                null,
+                null,
+                null
+            };
 
             TabBarList = new List<CustomTabBarItem>();
         }
@@ -224,6 +220,14 @@ namespace PageViewController.ViewControllers
                             containerScrollView.AlwaysBounceHorizontal = false;
                             containerScrollView.ShowsHorizontalScrollIndicator = false;
                             containerScrollView.Delegate = new Test(this);
+                            if(!new MvxIosMajorVersionChecker(11).IsVersionOrHigher)
+                            {
+                                 containerScrollView.ContentInsetAdjustmentBehavior= UIScrollViewContentInsetAdjustmentBehavior.Never;
+                            }
+                            else
+                            {
+                                 this.AutomaticallyAdjustsScrollViewInsets=false;
+                            }
                         }
                     },
                     tabbarLayout
@@ -233,6 +237,8 @@ namespace PageViewController.ViewControllers
             this.View = new UILayoutHost(layout) { BackgroundColor = UIColor.White };
 
             LayoutPages();
+
+            CurrentIndex = 2;
         }
 
         public override void ViewWillAppear(bool animated)
@@ -244,8 +250,6 @@ namespace PageViewController.ViewControllers
         public override void ViewDidLayoutSubviews()
         {
             base.ViewDidLayoutSubviews();
-
-            CurrentIndex = 2;
         }
 
         void LayoutPages()
@@ -265,6 +269,7 @@ namespace PageViewController.ViewControllers
             }
             containerScrollView.Frame = new CGRect(0, 0, width, height); 
             containerScrollView.ContentSize = new CGSize(width * (nfloat)ViewControllers.Count, height);
+            System.Diagnostics.Debug.WriteLine(containerScrollView.Frame);
         }
 
         class CustomTabBarItem : NativeView
@@ -406,7 +411,6 @@ namespace PageViewController.ViewControllers
             {
                 if (_viewController.DisabledScorlledDelegate)
                     return;
-                System.Diagnostics.Debug.WriteLine("Scrollview"+DateTime.Now.ToString());
                 var moveToLeft = offset - scrollView.ContentOffset.X < 0;
                 offset = scrollView.ContentOffset.X;
                 double t = offset / pageWidth;
@@ -417,7 +421,6 @@ namespace PageViewController.ViewControllers
                     if (page >= 0 && (int)page < _viewController.ViewControllers.Count)
                     {
                         _viewController.CurrentIndex = page;
-                        //System.Diagnostics.Debug.WriteLine($"offset:{scrollView.ContentOffset.X} , scrolledPage:{page} ,moveToLeft:{moveToLeft}");
                     }
                 }
 
