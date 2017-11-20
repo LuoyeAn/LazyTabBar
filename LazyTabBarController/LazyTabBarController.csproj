@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\NuGet.Build.Packaging.0.1.276\build\NuGet.Build.Packaging.props" Condition="Exists('..\packages\NuGet.Build.Packaging.0.1.276\build\NuGet.Build.Packaging.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -11,6 +12,16 @@
     <RootNamespace>LazyTabBarController</RootNamespace>
     <IPhoneResourcePrefix>Resources</IPhoneResourcePrefix>
     <AssemblyName>LazyTabBarController</AssemblyName>
+    <PackOnBuild>true</PackOnBuild>
+    <PackageId>LazyTabBar</PackageId>
+    <PackageVersion>0.0.1</PackageVersion>
+    <Authors>TingtingAn</Authors>
+    <Owners>Tingting</Owners>
+    <PackageProjectUrl>https://github.com/TingtingAn/xamarin-ios-pageviewcontroller-example-master</PackageProjectUrl>
+    <Summary>A Custom TabBarController that implements lazying to load. </Summary>
+    <PackageTags>Xamarin  LazyTabBar</PackageTags>
+    <Title>LazyTabBar</Title>
+    <Description>A Custom TabBarController that implements lazying to load. </Description>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -74,4 +85,5 @@
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
+  <Import Project="..\packages\NuGet.Build.Packaging.0.1.276\build\NuGet.Build.Packaging.targets" Condition="Exists('..\packages\NuGet.Build.Packaging.0.1.276\build\NuGet.Build.Packaging.targets')" />
 </Project>
