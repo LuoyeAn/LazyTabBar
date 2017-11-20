@@ -14,7 +14,7 @@ using MvvmCross.Core.Views;
 
 namespace LazyTabBarController
 {
-    public abstract class LazyTabBarController : MvxViewController
+    public abstract class LazyTabBarController : UIViewController
     {
         List<CustomTabBarItem> TabBarList;
 
@@ -141,13 +141,7 @@ namespace LazyTabBarController
 
         public LazyTabBarController()
         {
-            ViewControllers = new List<UIViewController>
-            {
-                null,
-                null,
-                null,
-                null
-            };
+            ViewControllers = new List<UIViewController> { null, null, null, null };
 
             TabBarList = new List<CustomTabBarItem>();
         }
@@ -253,13 +247,15 @@ namespace LazyTabBarController
         public virtual UIColor SelectedTabBarTintColor => UIColor.Red;
         public virtual UIColor UnSelectedTabBarTintColor => UIColor.Gray;
 
-        class CustomTabBarItem : NativeView
+        private class CustomTabBarItem : NativeView
         {
             private UIImageView _bottomImage;
             private UIImageView _image;
             private UILabel _titleLabel;
             private string _imageName;
             private int _index;
+            private UIColor _selectColor=UIColor.Red;
+            private UIColor _unSelectColor=UIColor.Gray;
             public CustomTabBarItem(string imageName, string title, Action<int> action, int index)
             {
                 _imageName = imageName;
@@ -346,6 +342,12 @@ namespace LazyTabBarController
                 };
             }
 
+            public void SetColor(UIColor selectColor,UIColor unSelectColor)
+            {
+                _selectColor = selectColor;
+                _unSelectColor = unSelectColor;
+            }
+
             private bool _selected;
             public bool Selected
             {
@@ -356,18 +358,31 @@ namespace LazyTabBarController
                     if (value)
                     {
                         _bottomImage.GetNativeView().Gone = false;
-                        _image.Image = UIImage.FromBundle(_imageName);
+                        _image.Image =CreateColoredImage(_selectColor,UIImage.FromBundle(_imageName));
 
-                        _titleLabel.TextColor = UIColor.Red;
+                        _titleLabel.TextColor = _selectColor;
                     }
                     else
                     {
                         _bottomImage.GetNativeView().Gone = true;
-                        _image.Image = UIImage.FromBundle(_imageName);
-                        _titleLabel.TextColor = UIColor.Gray;
+                        _image.Image = CreateColoredImage(_unSelectColor,UIImage.FromBundle(_imageName));
+                        _titleLabel.TextColor = _unSelectColor;
                     }
-                    View.SetNeedsLayout();
                 }
+            }
+
+            private UIImage CreateColoredImage(UIColor color, UIImage mask)
+            {
+                var rect = new CGRect(CGPoint.Empty, mask.Size);
+                UIGraphics.BeginImageContextWithOptions(mask.Size, false, mask.CurrentScale);
+                CGContext context = UIGraphics.GetCurrentContext();
+                mask.DrawAsPatternInRect(rect);
+                context.SetFillColor(color.CGColor);
+                context.SetBlendMode(CGBlendMode.SourceAtop);
+                context.FillRect(rect);
+                UIImage result = UIGraphics.GetImageFromCurrentImageContext();
+                UIGraphics.EndImageContext();
+                return result;
             }
         }
 
@@ -412,15 +427,6 @@ namespace LazyTabBarController
                 else
                     _viewController.MovingToCurrentPage = moveToLeft && (result > 0) || (!moveToLeft) && (result < 0);
             }
-        }
-    }
-
-    public abstract class LazyTabBarController<TViewModel> : LazyTabBarController, IMvxIosView<TViewModel> where TViewModel : class, IMvxViewModel
-    {
-        public new TViewModel ViewModel
-        {
-            get { return (TViewModel)base.ViewModel; }
-            set { base.ViewModel = value; }
         }
     }
 }
