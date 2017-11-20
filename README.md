@@ -3,6 +3,6 @@
 [![NuGet](https://img.shields.io/nuget/v/LazyTabBar.svg)](https://www.nuget.org/packages/LazyTabBar)
 [![NuGet Pre Release](https://img.shields.io/nuget/vpre/LazyTabBar.svg)](https://www.nuget.org/packages/LazyTabBar)
 [![CodeFactor](https://www.codefactor.io/repository/github/tingtingan/LazyTabBar/badge)](https://www.codefactor.io/repository/github/tingtingan/LazyTabBar)
-[![BCH compliance](https://bettercodehub.com/edge/badge/TingtingAn/LazyTabBar?branch=Dev)](https://bettercodehub.com/)
+[![BCH compliance](https://bettercodehub.com/edge/badge/TingtingAn/LazyTabBar?branch=CustomPageViewController)](https://bettercodehub.com/)
 
 A LazyTabBarController that implements swiping left/right to switch controllers and lazying to load controllers.
