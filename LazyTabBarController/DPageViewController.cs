@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,10 +8,13 @@ using UIKit;
 using CoreGraphics;
 using XibFree;
 using MvvmCross.Platform.iOS.Platform;
+using MvvmCross.iOS.Views;
+using MvvmCross.Core.ViewModels;
+using MvvmCross.Core.Views;
 
 namespace LazyTabBarController
 {
-    public class LazyTabBarController : UIViewController
+    public abstract class LazyTabBarController : MvxViewController
     {
         List<CustomTabBarItem> TabBarList;
 
@@ -26,36 +29,11 @@ namespace LazyTabBarController
         }
 
         nfloat width = UIScreen.MainScreen.Bounds.Width;
-        private nfloat height
-        {
-            get
-            {
-                return UIScreen.MainScreen.Bounds.Height - TabBarHeight ;
-            }
-        }
+        private nfloat height => UIScreen.MainScreen.Bounds.Height - TabBarHeight;
 
-        private bool IsIphoneX()
-        {
-            return UIScreen.MainScreen.Bounds.Height == 812;
-        }
+        private bool IsIphoneX() => UIScreen.MainScreen.Bounds.Height == 812;
 
-        public virtual UIViewController InitTabControllers(int index)
-        {
-            return null;
-            //switch (index)
-            //{
-            //    case 0:
-            //        return new A();
-            //    case 1:
-            //        return new B();
-            //    case 2:
-            //        return new C();
-            //    case 3:
-            //        return new D();
-            //    default:
-            //        return new A();
-            //}
-        }
+        public abstract UIViewController InitTabControllers(int index);
 
         UIScrollView containerScrollView;
         public List<UIViewController> ViewControllers;
@@ -75,7 +53,7 @@ namespace LazyTabBarController
             {
                 if (_currentIndex == value)
                     return;
-                
+
                 if (value >= ViewControllers.Count)
                 {
                     value = ViewControllers.Count - 1;
@@ -92,12 +70,12 @@ namespace LazyTabBarController
                 containerScrollView.AddSubview(currentPage.View);
                 currentPage.DidMoveToParentViewController(this);
 
-                if(DisabledScorlledDelegate)
+                if (DisabledScorlledDelegate)
                 {
-                    containerScrollView.ContentOffset = new CGPoint((nfloat)value * width,0);
+                    containerScrollView.ContentOffset = new CGPoint((nfloat)value * width, 0);
                     DisabledScorlledDelegate = false;
 
-                    if(_currentIndex>=0)
+                    if (_currentIndex >= 0)
                     {
                         var otherPage = ViewControllers[_currentIndex];
                         otherPage?.WillMoveToParentViewController(null);
@@ -193,13 +171,13 @@ namespace LazyTabBarController
                 Padding = new UIEdgeInsets(0, 0, IsIphoneX() ? 34 : 0, 0)
             };
 
-            for (var i = 0; i < 4;i++)
+            for (var i = 0; i < 4; i++)
             {
                 var tabBar = new CustomTabBarItem("settings_challenges", "Challenges", (index) =>
                 {
                     DisabledScorlledDelegate = true;
                     CurrentIndex = index;
-                },i);
+                }, i);
                 TabBarList.Add(tabBar);
                 tabbarLayout.AddSubView(tabBar);
             }
@@ -265,13 +243,15 @@ namespace LazyTabBarController
                 var page = ViewControllers[i];
                 if (page == null)
                     break;
-                var nextFrame = new CGRect((nfloat)i * width, 0, width, height); 
+                var nextFrame = new CGRect((nfloat)i * width, 0, width, height);
                 page.View.Frame = nextFrame;
             }
-            containerScrollView.Frame = new CGRect(0, 0, width, height); 
+            containerScrollView.Frame = new CGRect(0, 0, width, height);
             containerScrollView.ContentSize = new CGSize(width * (nfloat)ViewControllers.Count, height);
-            System.Diagnostics.Debug.WriteLine(containerScrollView.Frame);
         }
+
+        public virtual UIColor SelectedTabBarTintColor => UIColor.Red;
+        public virtual UIColor UnSelectedTabBarTintColor => UIColor.Gray;
 
         class CustomTabBarItem : NativeView
         {
@@ -280,7 +260,7 @@ namespace LazyTabBarController
             private UILabel _titleLabel;
             private string _imageName;
             private int _index;
-            public CustomTabBarItem(string imageName, string title, Action<int> action,int index)
+            public CustomTabBarItem(string imageName, string title, Action<int> action, int index)
             {
                 _imageName = imageName;
                 _index = index;
@@ -289,72 +269,66 @@ namespace LazyTabBarController
                     LayoutParameters = new LayoutParameters(AutoSize.FillParent, AutoSize.FillParent),
                     SubViews = new View[]
                     {
-                    new NativeView
-                    {
-                        View=new UIView(),
-                        LayoutParameters=new LayoutParameters(AutoSize.FillParent,5)
-                    },
-                    new NativeView
-                    {
-                        View=new UIView(),
-                        LayoutParameters=new LayoutParameters(AutoSize.FillParent,AutoSize.FillParent,2)
-                    },
-                    new LinearLayout(Orientation.Horizontal)
-                    {
-                        LayoutParameters=new LayoutParameters(AutoSize.WrapContent,AutoSize.WrapContent)
+                        new NativeView
                         {
-                            Gravity=Gravity.CenterHorizontal
-                        },
-                        SubViews=new View[]
-                        {
-                            new NativeView
+                            View=new UIView(),
+                            LayoutParameters=new LayoutParameters(AutoSize.FillParent,AutoSize.FillParent,2)
                             {
-                                View=_image=new UIImageView(),
-                                LayoutParameters=new LayoutParameters(40,40)
-                                {
-                                },
-                                Init = view =>
-                                {
-                                    var imageView=view.As<UIImageView>();
-                                    imageView.Image = UIImage.FromBundle(imageName);
-                                }
+                                MarginTop=5
+                            }
+                        },
+                        new LinearLayout(Orientation.Horizontal)
+                        {
+                            LayoutParameters=new LayoutParameters(AutoSize.WrapContent,AutoSize.WrapContent)
+                            {
+                                Gravity=Gravity.CenterHorizontal
                             },
-                        }
-                    },
-                    new NativeView
-                    {
-                        View=new UIView(),
-                        LayoutParameters=new LayoutParameters(AutoSize.FillParent,AutoSize.FillParent)
-                    },
-                    new NativeView
-                    {
-                        View=_titleLabel=new UILabel()
-                        {
-                            Text=title,
-                            TextAlignment= UITextAlignment.Center,
-                            TextColor=UIColor.Gray,
+                            SubViews=new View[]
+                            {
+                                new NativeView
+                                {
+                                    View=_image=new UIImageView(),
+                                    LayoutParameters=new LayoutParameters(40,40)
+                                    {
+                                    },
+                                    Init = view =>
+                                    {
+                                        var imageView=view.As<UIImageView>();
+                                        imageView.Image = UIImage.FromBundle(imageName);
+                                    }
+                                },
+                            }
                         },
-                        LayoutParameters=new LayoutParameters(AutoSize.FillParent,AutoSize.WrapContent)
+                        new NativeView
                         {
+                            View=new UIView(),
+                            LayoutParameters=new LayoutParameters(AutoSize.FillParent,AutoSize.FillParent)
                         },
-                        Gone=string.IsNullOrEmpty(title)
-                    },
-                    new NativeView
-                    {
-                        View=new UIView(),
-                        LayoutParameters=new LayoutParameters(AutoSize.FillParent,8)
-                    },
-                    new NativeView
-                    {
-                        View=_bottomImage=new UIImageView {Image=UIImage.FromBundle("trigon") },
-                        LayoutParameters=new LayoutParameters(AutoSize.WrapContent,AutoSize.WrapContent)
+                        new NativeView
                         {
-                            Gravity=Gravity.BottomCenter,
-                            MarginTop=-7,
-                            MarginBottom=-7f
+                            View=_titleLabel=new UILabel()
+                            {
+                                Text=title,
+                                TextAlignment= UITextAlignment.Center,
+                                TextColor=UIColor.Gray,
+                            },
+                            LayoutParameters=new LayoutParameters(AutoSize.FillParent,AutoSize.WrapContent)
+                            {
+                                MarginBottom=8
+                            },
+                            Gone=string.IsNullOrEmpty(title)
                         },
-                        Gone=true
-                    },
+                        new NativeView
+                        {
+                            View=_bottomImage=new UIImageView {Image=UIImage.FromBundle("trigon") },
+                            LayoutParameters=new LayoutParameters(AutoSize.WrapContent,AutoSize.WrapContent)
+                            {
+                                Gravity=Gravity.BottomCenter,
+                                MarginTop=-7,
+                                MarginBottom=-7f
+                            },
+                            Gone=true
+                        },
                     }
                 });
                 Init = view =>
@@ -438,10 +412,15 @@ namespace LazyTabBarController
                 else
                     _viewController.MovingToCurrentPage = moveToLeft && (result > 0) || (!moveToLeft) && (result < 0);
             }
+        }
+    }
 
-            public override void ScrollAnimationEnded(UIScrollView scrollView)
-            {
-            }
+    public abstract class LazyTabBarController<TViewModel> : LazyTabBarController, IMvxIosView<TViewModel> where TViewModel : class, IMvxViewModel
+    {
+        public new TViewModel ViewModel
+        {
+            get { return (TViewModel)base.ViewModel; }
+            set { base.ViewModel = value; }
         }
     }
 }
