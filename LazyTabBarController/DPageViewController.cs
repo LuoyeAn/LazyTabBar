@@ -141,14 +141,14 @@ namespace LazyTabBarController
 
         public LazyTabBarController()
         {
-            ViewControllers = new List<UIViewController> { null, null, null, null };
-
-            TabBarList = new List<CustomTabBarItem>();
         }
 
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
+
+            ViewControllers = new List<UIViewController> { null, null, null, null };
+            TabBarList = new List<CustomTabBarItem>();
 
             DisabledScorlledDelegate = true;
 
@@ -210,13 +210,19 @@ namespace LazyTabBarController
 
             LayoutPages();
 
-            CurrentIndex = 2;
+            InitSelectedTab();
+        }
+
+        public virtual void InitSelectedTab()
+        {
+            CurrentIndex = 0;
         }
 
         public override void ViewWillAppear(bool animated)
         {
             base.ViewWillAppear(animated);
             this.NavigationController.NavigationBarHidden = true;
+            this.NavigationController.NavigationBar.TintColor = UIColor.White.ColorWithAlpha(0);
         }
 
         public override void ViewDidLayoutSubviews()
@@ -292,14 +298,11 @@ namespace LazyTabBarController
                     LayoutParameters = new LayoutParameters(AutoSize.FillParent, AutoSize.FillParent),
                     SubViews = new View[]
                     {
-                        new NativeView
-                        {
-                            View=new UIView(),
-                            LayoutParameters=new LayoutParameters(AutoSize.FillParent,AutoSize.FillParent,2)
-                            {
-                                MarginTop=5
-                            }
-                        },
+                        //new NativeView
+                        //{
+                        //    View=new UIView(),
+                        //    LayoutParameters=new LayoutParameters(AutoSize.FillParent,AutoSize.FillParent),
+                        //},
                         new LinearLayout(Orientation.Horizontal)
                         {
                             LayoutParameters=new LayoutParameters(AutoSize.WrapContent,AutoSize.WrapContent)
@@ -323,11 +326,12 @@ namespace LazyTabBarController
                                 },
                             }
                         },
-                        new NativeView
-                        {
-                            View=new UIView(),
-                            LayoutParameters=new LayoutParameters(AutoSize.FillParent,AutoSize.FillParent)
-                        },
+                        //new NativeView
+                        //{
+                        //    View=new UIView(),
+                        //    LayoutParameters=new LayoutParameters(AutoSize.FillParent,AutoSize.FillParent),
+                        //    Gone=string.IsNullOrEmpty(title)||string.IsNullOrEmpty(imageName)
+                        //},
                         new NativeView
                         {
                             View=_titleLabel=new UILabel()
@@ -339,17 +343,23 @@ namespace LazyTabBarController
                             },
                             LayoutParameters=new LayoutParameters(AutoSize.FillParent,AutoSize.WrapContent)
                             {
-                                MarginBottom=8
                             },
                             Gone=string.IsNullOrEmpty(title)
+                        },
+                        new NativeView
+                        {
+                            View=new UIView(),
+                            LayoutParameters=new LayoutParameters(AutoSize.FillParent,AutoSize.FillParent)
+                            {
+                                MinHeight=8
+                            }
                         },
                         new NativeView
                         {
                             View=_bottomImage=new UIImageView {Image=UIImage.FromBundle("trigon") },
                             LayoutParameters=new LayoutParameters(AutoSize.WrapContent,AutoSize.WrapContent)
                             {
-                                Gravity=Gravity.BottomCenter,
-                                MarginTop=-7,
+                                Gravity=Gravity.CenterHorizontal,
                                 MarginBottom=-7f
                             },
                             Gone=true

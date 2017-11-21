@@ -37,12 +37,19 @@ namespace PageViewController.ViewControllers
                 case 1:
                     return ("test", "settings_activity");
                 case 2:
-                    return ("test", "settings_activity");
+                    return ("", "settings_activity");
                 case 3:
-                    return ("test", "settings_activity");
+                    return ("test", "");
                 default:
                     return ("test", "settings_activity");
             }
         }
+
+        public override void InitSelectedTab()
+        {
+            CurrentIndex = 2;
+        }
+
+        public override UIColor SelectedTabBarTintColor => UIColor.Orange;
     }
 }
