@@ -3,14 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-using Foundation;
 using UIKit;
 using CoreGraphics;
 using XibFree;
 using MvvmCross.Platform.iOS.Platform;
-using MvvmCross.iOS.Views;
-using MvvmCross.Core.ViewModels;
-using MvvmCross.Core.Views;
 
 namespace LazyTabBarController
 {
@@ -35,6 +31,8 @@ namespace LazyTabBarController
 
         public abstract UIViewController InitTabControllers(int index);
 
+        public abstract (string name, string icon) InitTabBarNameAndIcon(int index);
+
         UIScrollView containerScrollView;
         public List<UIViewController> ViewControllers;
 
@@ -44,6 +42,8 @@ namespace LazyTabBarController
             get => _otherIndex;
             set => _otherIndex = value;
         }
+
+        public bool DisabledScorlledDelegate { get; set; }
 
         int _currentIndex = -1;
         public int CurrentIndex
@@ -146,8 +146,6 @@ namespace LazyTabBarController
             TabBarList = new List<CustomTabBarItem>();
         }
 
-        public bool DisabledScorlledDelegate { get; set; }
-
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
@@ -167,11 +165,12 @@ namespace LazyTabBarController
 
             for (var i = 0; i < 4; i++)
             {
-                var tabBar = new CustomTabBarItem("settings_challenges", "Challenges", (index) =>
-                {
-                    DisabledScorlledDelegate = true;
-                    CurrentIndex = index;
-                }, i);
+                var nameAndIcon = InitTabBarNameAndIcon(i);
+                var tabBar = GetTabBarItem(nameAndIcon.icon, nameAndIcon.name, (index) =>
+                 {
+                     DisabledScorlledDelegate = true;
+                     CurrentIndex = index;
+                 }, i);
                 TabBarList.Add(tabBar);
                 tabbarLayout.AddSubView(tabBar);
             }
@@ -192,7 +191,7 @@ namespace LazyTabBarController
                             containerScrollView.AlwaysBounceVertical = false;
                             containerScrollView.AlwaysBounceHorizontal = false;
                             containerScrollView.ShowsHorizontalScrollIndicator = false;
-                            containerScrollView.Delegate = new Test(this);
+                            containerScrollView.Delegate = new ScrollViewDelegate(this);
                             if(!new MvxIosMajorVersionChecker(11).IsVersionOrHigher)
                             {
                                  containerScrollView.ContentInsetAdjustmentBehavior= UIScrollViewContentInsetAdjustmentBehavior.Never;
@@ -244,8 +243,18 @@ namespace LazyTabBarController
             containerScrollView.ContentSize = new CGSize(width * (nfloat)ViewControllers.Count, height);
         }
 
-        public virtual UIColor SelectedTabBarTintColor => UIColor.Red;
+        public virtual UIColor SelectedTabBarTintColor => UIColor.Green;
         public virtual UIColor UnSelectedTabBarTintColor => UIColor.Gray;
+
+        private CustomTabBarItem GetTabBarItem(string imageName, string title, Action<int> action, int index)
+        {
+            var customTabBarItem = new CustomTabBarItem(imageName, title, action, index)
+            {
+                SelectedColor = SelectedTabBarTintColor,
+                UnSelectedColor = UnSelectedTabBarTintColor
+            };
+            return customTabBarItem;
+        }
 
         private class CustomTabBarItem : NativeView
         {
@@ -254,8 +263,26 @@ namespace LazyTabBarController
             private UILabel _titleLabel;
             private string _imageName;
             private int _index;
-            private UIColor _selectColor=UIColor.Red;
-            private UIColor _unSelectColor=UIColor.Gray;
+            private UIColor _selectedColor = UIColor.Red;
+            public UIColor SelectedColor
+            {
+                get => _selectedColor;
+                set
+                {
+                    _selectedColor = value;
+                    SetColor();
+                }
+            }
+            private UIColor _unSelectedColor = UIColor.Gray;
+            public UIColor UnSelectedColor
+            {
+                get => _unSelectedColor;
+                set
+                {
+                    _unSelectedColor = value;
+                    SetColor();
+                }
+            }
             public CustomTabBarItem(string imageName, string title, Action<int> action, int index)
             {
                 _imageName = imageName;
@@ -291,7 +318,8 @@ namespace LazyTabBarController
                                     {
                                         var imageView=view.As<UIImageView>();
                                         imageView.Image = UIImage.FromBundle(imageName);
-                                    }
+                                    },
+                                    Gone=string.IsNullOrEmpty(imageName)
                                 },
                             }
                         },
@@ -307,6 +335,7 @@ namespace LazyTabBarController
                                 Text=title,
                                 TextAlignment= UITextAlignment.Center,
                                 TextColor=UIColor.Gray,
+                                Font= UIFont.FromName(new UILabel().Font.Name,14)
                             },
                             LayoutParameters=new LayoutParameters(AutoSize.FillParent,AutoSize.WrapContent)
                             {
@@ -337,15 +366,26 @@ namespace LazyTabBarController
                     gesture.AddTarget(() =>
                     {
                         action?.Invoke(_index);
-                        Selected = true;
                     });
                 };
             }
 
-            public void SetColor(UIColor selectColor,UIColor unSelectColor)
+            private void SetColor()
             {
-                _selectColor = selectColor;
-                _unSelectColor = unSelectColor;
+                if (Selected)
+                {
+                    if (!string.IsNullOrEmpty(_imageName))
+                        _image.Image = CreateColoredImage(SelectedColor, UIImage.FromBundle(_imageName));
+                    _bottomImage.Image = CreateColoredImage(SelectedColor, UIImage.FromBundle("trigon"));
+                    _titleLabel.TextColor = SelectedColor;
+                }
+                else
+                {
+                    if (!string.IsNullOrEmpty(_imageName))
+                        _image.Image = CreateColoredImage(UnSelectedColor, UIImage.FromBundle(_imageName));
+                    _bottomImage.Image = CreateColoredImage(UnSelectedColor, UIImage.FromBundle("trigon"));
+                    _titleLabel.TextColor = UnSelectedColor;
+                }
             }
 
             private bool _selected;
@@ -358,16 +398,13 @@ namespace LazyTabBarController
                     if (value)
                     {
                         _bottomImage.GetNativeView().Gone = false;
-                        _image.Image =CreateColoredImage(_selectColor,UIImage.FromBundle(_imageName));
-
-                        _titleLabel.TextColor = _selectColor;
                     }
                     else
                     {
                         _bottomImage.GetNativeView().Gone = true;
-                        _image.Image = CreateColoredImage(_unSelectColor,UIImage.FromBundle(_imageName));
-                        _titleLabel.TextColor = _unSelectColor;
                     }
+                    SetColor();
+                    _bottomImage.GetLayoutHost().SetNeedsLayout();
                 }
             }
 
@@ -386,11 +423,11 @@ namespace LazyTabBarController
             }
         }
 
-        private class Test : UIScrollViewDelegate
+        private class ScrollViewDelegate : UIScrollViewDelegate
         {
             private LazyTabBarController _viewController;
             private nfloat pageWidth;
-            public Test(LazyTabBarController viewcontroller)
+            public ScrollViewDelegate(LazyTabBarController viewcontroller)
             {
                 _viewController = viewcontroller;
                 pageWidth = viewcontroller.width;

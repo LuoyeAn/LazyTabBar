@@ -27,5 +27,22 @@ namespace PageViewController.ViewControllers
                     return new A();
             }
         }
+
+        public override (string name, string icon) InitTabBarNameAndIcon(int index)
+        {
+            switch (index)
+            {
+                case 0:
+                    return ("test", "settings_activity");
+                case 1:
+                    return ("test", "settings_activity");
+                case 2:
+                    return ("test", "settings_activity");
+                case 3:
+                    return ("test", "settings_activity");
+                default:
+                    return ("test", "settings_activity");
+            }
+        }
     }
 }

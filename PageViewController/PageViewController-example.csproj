@@ -121,9 +121,6 @@
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
   <ItemGroup>
-    <BundleResource Include="Resources\trigon%402x.png" />
-  </ItemGroup>
-  <ItemGroup>
     <BundleResource Include="Resources\settings_activity%402x.png" />
   </ItemGroup>
   <ItemGroup>
