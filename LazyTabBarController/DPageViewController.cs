@@ -293,16 +293,17 @@ namespace LazyTabBarController
             {
                 _imageName = imageName;
                 _index = index;
+                LayoutParameters = new LayoutParameters(AutoSize.FillParent, 70);
                 View = new UILayoutHost(new LinearLayout(Orientation.Vertical)
                 {
                     LayoutParameters = new LayoutParameters(AutoSize.FillParent, AutoSize.FillParent),
                     SubViews = new View[]
                     {
-                        //new NativeView
-                        //{
-                        //    View=new UIView(),
-                        //    LayoutParameters=new LayoutParameters(AutoSize.FillParent,AutoSize.FillParent),
-                        //},
+                        new NativeView
+                        {
+                            View=new UIView(),//{BackgroundColor=UIColor.Red},
+                            LayoutParameters=new LayoutParameters(AutoSize.FillParent,AutoSize.FillParent),
+                        },
                         new LinearLayout(Orientation.Horizontal)
                         {
                             LayoutParameters=new LayoutParameters(AutoSize.WrapContent,AutoSize.WrapContent)
@@ -314,7 +315,7 @@ namespace LazyTabBarController
                                 new NativeView
                                 {
                                     View=_image=new UIImageView(),
-                                    LayoutParameters=new LayoutParameters(40,40)
+                                    LayoutParameters=new LayoutParameters(30,30)
                                     {
                                     },
                                     Init = view =>
@@ -326,12 +327,12 @@ namespace LazyTabBarController
                                 },
                             }
                         },
-                        //new NativeView
-                        //{
-                        //    View=new UIView(),
-                        //    LayoutParameters=new LayoutParameters(AutoSize.FillParent,AutoSize.FillParent),
-                        //    Gone=string.IsNullOrEmpty(title)||string.IsNullOrEmpty(imageName)
-                        //},
+                        new NativeView
+                        {
+                            View=new UIView(),//{BackgroundColor=UIColor.Gray},
+                            LayoutParameters=new LayoutParameters(AutoSize.FillParent,AutoSize.FillParent),
+                            Gone=string.IsNullOrEmpty(title)||string.IsNullOrEmpty(imageName)
+                        },
                         new NativeView
                         {
                             View=_titleLabel=new UILabel()
@@ -348,10 +349,10 @@ namespace LazyTabBarController
                         },
                         new NativeView
                         {
-                            View=new UIView(),
+                            View=new UIView(),//{BackgroundColor=UIColor.Green},
                             LayoutParameters=new LayoutParameters(AutoSize.FillParent,AutoSize.FillParent)
                             {
-                                MinHeight=8
+                                MinHeight=7
                             }
                         },
                         new NativeView
@@ -360,7 +361,8 @@ namespace LazyTabBarController
                             LayoutParameters=new LayoutParameters(AutoSize.WrapContent,AutoSize.WrapContent)
                             {
                                 Gravity=Gravity.CenterHorizontal,
-                                MarginBottom=-7f
+                                MarginBottom=-7f,
+                                MarginTop=-7f
                             },
                             Gone=true
                         },
