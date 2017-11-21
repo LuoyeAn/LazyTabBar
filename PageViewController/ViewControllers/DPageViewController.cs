@@ -33,15 +33,15 @@ namespace PageViewController.ViewControllers
             switch (index)
             {
                 case 0:
-                    return ("test", "settings_activity");
+                    return ("test", "alex_simple_small");
                 case 1:
-                    return ("test", "settings_activity");
+                    return ("test", "ge_icon_challenges@");
                 case 2:
-                    return ("", "settings_activity");
+                    return ("", "ge_icon_rewards");
                 case 3:
                     return ("test", "");
                 default:
-                    return ("test", "settings_activity");
+                    return ("test", "icon_activity");
             }
         }
 
