@@ -251,10 +251,11 @@ namespace LazyTabBarController
 
         public virtual UIColor SelectedTabBarTintColor => UIColor.Green;
         public virtual UIColor UnSelectedTabBarTintColor => UIColor.Gray;
+        public virtual UIFont TabBarFont => new UILabel().Font;
 
         private CustomTabBarItem GetTabBarItem(string imageName, string title, Action<int> action, int index)
         {
-            var customTabBarItem = new CustomTabBarItem(imageName, title, action, index)
+            var customTabBarItem = new CustomTabBarItem(imageName, title, action, index,TabBarFont)
             {
                 SelectedColor = SelectedTabBarTintColor,
                 UnSelectedColor = UnSelectedTabBarTintColor
@@ -289,7 +290,7 @@ namespace LazyTabBarController
                     SetColor();
                 }
             }
-            public CustomTabBarItem(string imageName, string title, Action<int> action, int index)
+            public CustomTabBarItem(string imageName, string title, Action<int> action, int index, UIFont titleFont)
             {
                 _imageName = imageName;
                 _index = index;
@@ -320,9 +321,6 @@ namespace LazyTabBarController
                                         MaxWidth=25,
                                         MaxHeight=25
                                     },
-                                    //LayoutParameters=new LayoutParameters(25,25)
-                                    //{
-                                    //},
                                     Init = view =>
                                     {
                                         var imageView=view.As<UIImageView>();
@@ -345,6 +343,7 @@ namespace LazyTabBarController
                                 Text=title,
                                 TextAlignment= UITextAlignment.Center,
                                 TextColor=UIColor.Gray,
+                                Font=titleFont
                             },
                             LayoutParameters=new LayoutParameters(AutoSize.FillParent,AutoSize.WrapContent)
                             {
