@@ -315,9 +315,14 @@ namespace LazyTabBarController
                                 new NativeView
                                 {
                                     View=_image=new UIImageView(),
-                                    LayoutParameters=new LayoutParameters(30,30)
+                                    LayoutParameters=new LayoutParameters(AutoSize.WrapContent,AutoSize.WrapContent)
                                     {
+                                        MaxWidth=25,
+                                        MaxHeight=25
                                     },
+                                    //LayoutParameters=new LayoutParameters(25,25)
+                                    //{
+                                    //},
                                     Init = view =>
                                     {
                                         var imageView=view.As<UIImageView>();
@@ -330,7 +335,7 @@ namespace LazyTabBarController
                         new NativeView
                         {
                             View=new UIView(),//{BackgroundColor=UIColor.Gray},
-                            LayoutParameters=new LayoutParameters(AutoSize.FillParent,AutoSize.FillParent),
+                            LayoutParameters=new LayoutParameters(AutoSize.FillParent,5),
                             Gone=string.IsNullOrEmpty(title)||string.IsNullOrEmpty(imageName)
                         },
                         new NativeView
@@ -340,7 +345,6 @@ namespace LazyTabBarController
                                 Text=title,
                                 TextAlignment= UITextAlignment.Center,
                                 TextColor=UIColor.Gray,
-                                Font= UIFont.FromName(new UILabel().Font.Name,14)
                             },
                             LayoutParameters=new LayoutParameters(AutoSize.FillParent,AutoSize.WrapContent)
                             {
