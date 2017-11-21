@@ -14,14 +14,14 @@
     <AssemblyName>LazyTabBarController</AssemblyName>
     <PackOnBuild>true</PackOnBuild>
     <PackageId>LazyTabBar</PackageId>
-    <PackageVersion>0.0.2</PackageVersion>
+    <PackageVersion>0.0.3</PackageVersion>
     <Authors>TingtingAn</Authors>
     <Owners>Tingting</Owners>
-    <PackageProjectUrl>https://github.com/TingtingAn/xamarin-ios-pageviewcontroller-example-master</PackageProjectUrl>
-    <Summary>A Custom TabBarController that implements lazying to load. </Summary>
+    <PackageProjectUrl>https://github.com/TingtingAn/LazyTabBar</PackageProjectUrl>
+    <Summary>A LazyTabBarController that implements swiping left/right to switch controllers and lazying to load controllers.</Summary>
     <PackageTags>Xamarin  LazyTabBar</PackageTags>
     <Title>LazyTabBar</Title>
-    <Description>A Custom TabBarController that implements lazying to load. </Description>
+    <Description>A LazyTabBarController that implements swiping left/right to switch controllers and lazying to load controllers.</Description>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
