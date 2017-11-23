@@ -251,10 +251,11 @@ namespace LazyTabBarController
 
         public virtual UIColor SelectedTabBarTintColor => UIColor.Green;
         public virtual UIColor UnSelectedTabBarTintColor => UIColor.Gray;
+        public virtual UIFont TabBarFont => new UILabel().Font;
 
         private CustomTabBarItem GetTabBarItem(string imageName, string title, Action<int> action, int index)
         {
-            var customTabBarItem = new CustomTabBarItem(imageName, title, action, index)
+            var customTabBarItem = new CustomTabBarItem(imageName, title, action, index,TabBarFont)
             {
                 SelectedColor = SelectedTabBarTintColor,
                 UnSelectedColor = UnSelectedTabBarTintColor
@@ -289,7 +290,7 @@ namespace LazyTabBarController
                     SetColor();
                 }
             }
-            public CustomTabBarItem(string imageName, string title, Action<int> action, int index)
+            public CustomTabBarItem(string imageName, string title, Action<int> action, int index, UIFont titleFont)
             {
                 _imageName = imageName;
                 _index = index;
@@ -315,8 +316,10 @@ namespace LazyTabBarController
                                 new NativeView
                                 {
                                     View=_image=new UIImageView(),
-                                    LayoutParameters=new LayoutParameters(30,30)
+                                    LayoutParameters=new LayoutParameters(AutoSize.WrapContent,AutoSize.WrapContent)
                                     {
+                                        MaxWidth=25,
+                                        MaxHeight=25
                                     },
                                     Init = view =>
                                     {
@@ -330,7 +333,7 @@ namespace LazyTabBarController
                         new NativeView
                         {
                             View=new UIView(),//{BackgroundColor=UIColor.Gray},
-                            LayoutParameters=new LayoutParameters(AutoSize.FillParent,AutoSize.FillParent),
+                            LayoutParameters=new LayoutParameters(AutoSize.FillParent,5),
                             Gone=string.IsNullOrEmpty(title)||string.IsNullOrEmpty(imageName)
                         },
                         new NativeView
@@ -340,7 +343,7 @@ namespace LazyTabBarController
                                 Text=title,
                                 TextAlignment= UITextAlignment.Center,
                                 TextColor=UIColor.Gray,
-                                Font= UIFont.FromName(new UILabel().Font.Name,14)
+                                Font=titleFont
                             },
                             LayoutParameters=new LayoutParameters(AutoSize.FillParent,AutoSize.WrapContent)
                             {
