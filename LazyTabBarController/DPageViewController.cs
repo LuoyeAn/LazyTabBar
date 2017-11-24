@@ -20,11 +20,12 @@ namespace LazyTabBarController
         private List<CustomTabBarItem> TabBarList;
         private UIScrollView containerScrollView;
         public List<UIViewController> ViewControllers;
+        public event EventHandler<int> PageIndexChanged;
 
         private int TabBarHeight => IsIphoneX() ? 104 : 70;
 
-        private nfloat width => UIScreen.MainScreen.Bounds.Width;
-        private nfloat height => UIScreen.MainScreen.Bounds.Height - TabBarHeight;
+        private nfloat Width => UIScreen.MainScreen.Bounds.Width;
+        private nfloat Height => UIScreen.MainScreen.Bounds.Height - TabBarHeight;
 
         private bool IsIphoneX() => UIScreen.MainScreen.Bounds.Height == 812;
 
@@ -62,7 +63,7 @@ namespace LazyTabBarController
                 if (currentPage == null)
                 {
                     currentPage = new UINavigationController(InitTabControllers(value));
-                    currentPage.View.Frame = new CGRect((nfloat)value * width, 0, width, height);
+                    currentPage.View.Frame = new CGRect((nfloat)value * Width, 0, Width, Height);
                     ViewControllers[value] = currentPage;
                 }
                 AddChildViewController(currentPage);
@@ -71,7 +72,7 @@ namespace LazyTabBarController
 
                 if (DisabledScorlledDelegate)
                 {
-                    containerScrollView.ContentOffset = new CGPoint((nfloat)value * width, 0);
+                    containerScrollView.ContentOffset = new CGPoint((nfloat)value * Width, 0);
                     DisabledScorlledDelegate = false;
 
                     if (_currentIndex >= 0)
@@ -91,6 +92,7 @@ namespace LazyTabBarController
                 }
 
                 _currentIndex = value;
+                PageIndexChanged?.Invoke(this, value);
             }
         }
 
@@ -242,11 +244,11 @@ namespace LazyTabBarController
                 var page = ViewControllers[i];
                 if (page == null)
                     break;
-                var nextFrame = new CGRect((nfloat)i * width, 0, width, height);
+                var nextFrame = new CGRect((nfloat)i * Width, 0, Width, Height);
                 page.View.Frame = nextFrame;
             }
-            containerScrollView.Frame = new CGRect(0, 0, width, height);
-            containerScrollView.ContentSize = new CGSize(width * (nfloat)ViewControllers.Count, height);
+            containerScrollView.Frame = new CGRect(0, 0, Width, Height);
+            containerScrollView.ContentSize = new CGSize(Width * (nfloat)ViewControllers.Count, Height);
         }
 
         public virtual UIColor SelectedTabBarTintColor => UIColor.Green;
@@ -277,7 +279,7 @@ namespace LazyTabBarController
         public MvxCommand<int> ChangeCurrentIndexCommand
             => new MvxCommand<int>((t) =>
             {
-                containerScrollView.SetContentOffset(new CGPoint(width * t, 0), true);
+                containerScrollView.SetContentOffset(new CGPoint(Width * t, 0), true);
             });
 
         private class CustomTabBarItem : NativeView
@@ -545,7 +547,7 @@ namespace LazyTabBarController
             public ScrollViewDelegate(LazyTabBarController viewcontroller)
             {
                 _viewController = viewcontroller;
-                pageWidth = viewcontroller.width;
+                pageWidth = viewcontroller.Width;
             }
 
             nfloat offset = 0;
