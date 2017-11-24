@@ -11,6 +11,18 @@ namespace PageViewController.ViewControllers
 {
     public class DPageViewController : LazyTabBarController.LazyTabBarController
     {
+        public DPageViewController() : base(4)
+        {
+
+        }
+
+        public override void ViewDidLoad()
+        {
+            base.ViewDidLoad();
+
+            this.NavigationController.NavigationBarHidden = false;
+            this.Title = "test";
+        }
         public override UIViewController InitTabControllers(int index)
         {
             switch (index)

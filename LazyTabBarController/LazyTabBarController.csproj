@@ -14,7 +14,7 @@
     <AssemblyName>LazyTabBarController</AssemblyName>
     <PackOnBuild>true</PackOnBuild>
     <PackageId>LazyTabBar</PackageId>
-    <PackageVersion>0.0.3</PackageVersion>
+    <PackageVersion>1.0</PackageVersion>
     <Authors>TingtingAn</Authors>
     <Owners>Tingting</Owners>
     <PackageProjectUrl>https://github.com/TingtingAn/LazyTabBar</PackageProjectUrl>
@@ -65,6 +65,9 @@
     </Reference>
     <Reference Include="MvvmCross.Platform.iOS, Version=5.3.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\MvvmCross.Platform.5.3.2\lib\Xamarin.iOS10\MvvmCross.Platform.iOS.dll</HintPath>
+    </Reference>
+    <Reference Include="SDWebImage, Version=3.7.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Xamarin.SDWebImage.3.7.5\lib\Xamarin.iOS\SDWebImage.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Xml" />

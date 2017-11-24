@@ -7,6 +7,10 @@ using UIKit;
 using CoreGraphics;
 using XibFree;
 using MvvmCross.Platform.iOS.Platform;
+using Foundation;
+using SDWebImage;
+using System.Drawing;
+using MvvmCross.Core.ViewModels;
 
 namespace LazyTabBarController
 {
@@ -52,7 +56,10 @@ namespace LazyTabBarController
             set
             {
                 if (_currentIndex == value)
+                {
+                    DisabledScorlledDelegate = false;
                     return;
+                }
 
                 if (value >= ViewControllers.Count)
                 {
@@ -83,7 +90,7 @@ namespace LazyTabBarController
                         otherPage?.View.RemoveFromSuperview();
                     }
                 }
-                for (var i = 0; i < 4; i++)
+                for (var i = 0; i < _count; i++)
                 {
                     if (i == value)
                         TabBarList[i].Selected = true;
@@ -139,15 +146,22 @@ namespace LazyTabBarController
             }
         }
 
-        public LazyTabBarController()
+        private int _count;
+
+        public LazyTabBarController(int count)
         {
+            _count = count;
         }
 
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
 
-            ViewControllers = new List<UIViewController> { null, null, null, null };
+            ViewControllers = new List<UIViewController>();
+            for (var i = 0; i < _count; i++)
+            {
+                ViewControllers.Add(null);
+            }
             TabBarList = new List<CustomTabBarItem>();
 
             DisabledScorlledDelegate = true;
@@ -163,14 +177,14 @@ namespace LazyTabBarController
                 Padding = new UIEdgeInsets(0, 0, IsIphoneX() ? 34 : 0, 0)
             };
 
-            for (var i = 0; i < 4; i++)
+            for (var i = 0; i < _count; i++)
             {
                 var nameAndIcon = InitTabBarNameAndIcon(i);
                 var tabBar = GetTabBarItem(nameAndIcon.icon, nameAndIcon.name, (index) =>
-                 {
-                     DisabledScorlledDelegate = true;
-                     CurrentIndex = index;
-                 }, i);
+                {
+                    DisabledScorlledDelegate = true;
+                    CurrentIndex = index;
+                }, i);
                 TabBarList.Add(tabBar);
                 tabbarLayout.AddSubView(tabBar);
             }
@@ -222,7 +236,7 @@ namespace LazyTabBarController
         {
             base.ViewWillAppear(animated);
             this.NavigationController.NavigationBarHidden = true;
-            this.NavigationController.NavigationBar.TintColor = UIColor.White.ColorWithAlpha(0);
+            //this.NavigationController.NavigationBar.TintColor = UIColor.White.ColorWithAlpha(0);
         }
 
         public override void ViewDidLayoutSubviews()
@@ -255,41 +269,39 @@ namespace LazyTabBarController
 
         private CustomTabBarItem GetTabBarItem(string imageName, string title, Action<int> action, int index)
         {
-            var customTabBarItem = new CustomTabBarItem(imageName, title, action, index,TabBarFont)
+            var customTabBarItem = new CustomTabBarItem(imageName, title, action, index, TabBarFont)
             {
                 SelectedColor = SelectedTabBarTintColor,
-                UnSelectedColor = UnSelectedTabBarTintColor
+                UnSelectedColor = UnSelectedTabBarTintColor,
+                DisHColor = index == 2
             };
             return customTabBarItem;
         }
+
+        public MvxCommand<int> ChangeDotCommand
+            => new MvxCommand<int>((t) => {
+                var tabBarItem = TabBarList.ElementAtOrDefault(2);
+                if (tabBarItem == null)
+                    return;
+                tabBarItem.SetDot(t);
+            });
+
+        public MvxCommand<int> ChangeCurrentIndexCommand
+            => new MvxCommand<int>((t) =>
+            {
+                containerScrollView.SetContentOffset(new CGPoint(width * t, 0), true);
+            });
 
         private class CustomTabBarItem : NativeView
         {
             private UIImageView _bottomImage;
             private UIImageView _image;
             private UILabel _titleLabel;
+            private UILabel _dotLabel;
             private string _imageName;
             private int _index;
-            private UIColor _selectedColor = UIColor.Red;
-            public UIColor SelectedColor
-            {
-                get => _selectedColor;
-                set
-                {
-                    _selectedColor = value;
-                    SetColor();
-                }
-            }
-            private UIColor _unSelectedColor = UIColor.Gray;
-            public UIColor UnSelectedColor
-            {
-                get => _unSelectedColor;
-                set
-                {
-                    _unSelectedColor = value;
-                    SetColor();
-                }
-            }
+            public bool DisHColor { get; set; }
+
             public CustomTabBarItem(string imageName, string title, Action<int> action, int index, UIFont titleFont)
             {
                 _imageName = imageName;
@@ -302,7 +314,7 @@ namespace LazyTabBarController
                     {
                         new NativeView
                         {
-                            View=new UIView(),//{BackgroundColor=UIColor.Red},
+                            View=new UIView(),
                             LayoutParameters=new LayoutParameters(AutoSize.FillParent,AutoSize.FillParent),
                         },
                         new LinearLayout(Orientation.Horizontal)
@@ -318,8 +330,8 @@ namespace LazyTabBarController
                                     View=_image=new UIImageView(),
                                     LayoutParameters=new LayoutParameters(AutoSize.WrapContent,AutoSize.WrapContent)
                                     {
-                                        MaxWidth=25,
-                                        MaxHeight=25
+                                        MaxWidth=35,
+                                        MaxHeight=35
                                     },
                                     Init = view =>
                                     {
@@ -328,11 +340,32 @@ namespace LazyTabBarController
                                     },
                                     Gone=string.IsNullOrEmpty(imageName)
                                 },
+                                new NativeView
+                                {
+                                    View=_dotLabel=new UILabel
+                                    {
+                                        TextColor=UIColor.White,
+                                        BackgroundColor=SelectedColor,
+                                        Font= UIFont.FromName(titleFont.Name,12f),
+                                    },
+                                    LayoutParameters=new LayoutParameters
+                                    {
+                                        Width=0,
+                                        Height=AutoSize.WrapContent,
+                                        Gravity= Gravity.TopRight,
+                                    },
+                                    Init=view=>
+                                    {
+                                        var label=view.As<UILabel>();
+                                        label.Layer.CornerRadius=6f;
+                                        label.ClipsToBounds=true;
+                                    }
+                                }
                             }
                         },
                         new NativeView
                         {
-                            View=new UIView(),//{BackgroundColor=UIColor.Gray},
+                            View=new UIView(),
                             LayoutParameters=new LayoutParameters(AutoSize.FillParent,5),
                             Gone=string.IsNullOrEmpty(title)||string.IsNullOrEmpty(imageName)
                         },
@@ -352,7 +385,7 @@ namespace LazyTabBarController
                         },
                         new NativeView
                         {
-                            View=new UIView(),//{BackgroundColor=UIColor.Green},
+                            View=new UIView(),
                             LayoutParameters=new LayoutParameters(AutoSize.FillParent,AutoSize.FillParent)
                             {
                                 MinHeight=7
@@ -383,21 +416,105 @@ namespace LazyTabBarController
                         action?.Invoke(_index);
                     });
                 };
+
+                SetDot(0);
+            }
+
+            public void SetDot(int dotCount)
+            {
+                if (_dotLabel == null)
+                    return;
+                if (dotCount < 0)
+                    return;
+                if (dotCount == 0)
+                {
+                    _dotLabel.GetNativeView().Gone = true;
+                    _dotLabel.GetLayoutHost().SetNeedsLayout();
+                    return;
+                }
+
+                var size = GetSize(dotCount);
+                _image.GetNativeView().LayoutParameters.MarginLeft = size.Width / 2 - 5;
+                _image.GetNativeView().LayoutParameters.MarginRight = size.Width / 2 - 5;
+                _dotLabel.Text = GetString(dotCount);
+                _dotLabel.Layer.CornerRadius = size.Height / 2;
+                _dotLabel.GetNativeView().LayoutParameters.Width = size.Width;
+                _dotLabel.GetNativeView().LayoutParameters.MarginLeft = -size.Width;
+                _dotLabel.GetNativeView().Gone = false;
+                _dotLabel.GetLayoutHost().SetNeedsLayout();
+            }
+
+            private CGSize GetSize(int dotCount)
+            {
+                if (dotCount <= 0)
+                    return Size.Empty;
+                return GetSizeFromString(GetString(dotCount), _dotLabel.Font);
+            }
+
+            private CGSize GetSizeFromString(string text, UIFont font)
+            {
+                if (string.IsNullOrEmpty(text))
+                    return CGSize.Empty;
+                NSString nsString = new NSString(text);
+                UIStringAttributes attribs = new UIStringAttributes { Font = font };
+                CGSize size = nsString.GetSizeUsingAttributes(attribs);
+                return size;
+            }
+
+            private string GetString(int dotCount)
+            {
+                return string.Format("  {0}  ", dotCount < 99 ? dotCount.ToString() : "99+");
+            }
+
+            private UIColor _selectedColor = UIColor.Red;
+            public UIColor SelectedColor
+            {
+                get => _selectedColor;
+                set
+                {
+                    _selectedColor = value;
+                    SetColor();
+                }
+            }
+            private UIColor _unSelectedColor = UIColor.Gray;
+            public UIColor UnSelectedColor
+            {
+                get => _unSelectedColor;
+                set
+                {
+                    _unSelectedColor = value;
+                    SetColor();
+                }
             }
 
             private void SetColor()
             {
                 if (Selected)
                 {
-                    if (!string.IsNullOrEmpty(_imageName))
-                        _image.Image = CreateColoredImage(SelectedColor, UIImage.FromBundle(_imageName));
+                    if (!string.IsNullOrEmpty(_imageName) && _imageName.StartsWith("http"))
+                        _image.SetImage(NSUrl.FromString(_imageName));
+                    else if (!string.IsNullOrEmpty(_imageName))
+                    {
+                        if (DisHColor)
+                            _image.Image = UIImage.FromBundle(_imageName);
+                        else
+                            _image.Image = CreateColoredImage(SelectedColor, UIImage.FromBundle(_imageName));
+                    }
+
                     _bottomImage.Image = CreateColoredImage(SelectedColor, UIImage.FromBundle("trigon"));
                     _titleLabel.TextColor = SelectedColor;
                 }
                 else
                 {
-                    if (!string.IsNullOrEmpty(_imageName))
-                        _image.Image = CreateColoredImage(UnSelectedColor, UIImage.FromBundle(_imageName));
+                    if (!string.IsNullOrEmpty(_imageName) && _imageName.StartsWith("http"))
+                        _image.SetImage(NSUrl.FromString(_imageName));
+                    else if (!string.IsNullOrEmpty(_imageName))
+                    {
+                        if (DisHColor)
+                            _image.Image = UIImage.FromBundle(_imageName);
+                        else
+                            _image.Image = CreateColoredImage(UnSelectedColor, UIImage.FromBundle(_imageName));
+                    }
                     _bottomImage.Image = CreateColoredImage(UnSelectedColor, UIImage.FromBundle("trigon"));
                     _titleLabel.TextColor = UnSelectedColor;
                 }
@@ -410,14 +527,7 @@ namespace LazyTabBarController
                 set
                 {
                     _selected = value;
-                    if (value)
-                    {
-                        _bottomImage.GetNativeView().Gone = false;
-                    }
-                    else
-                    {
-                        _bottomImage.GetNativeView().Gone = true;
-                    }
+                    _bottomImage.GetNativeView().Gone = !value;
                     SetColor();
                     _bottomImage.GetLayoutHost().SetNeedsLayout();
                 }
@@ -425,6 +535,8 @@ namespace LazyTabBarController
 
             private UIImage CreateColoredImage(UIColor color, UIImage mask)
             {
+                if (mask == null)
+                    throw new Exception($"LazyTabBar exception: cannot find the image named:{_imageName}");
                 var rect = new CGRect(CGPoint.Empty, mask.Size);
                 UIGraphics.BeginImageContextWithOptions(mask.Size, false, mask.CurrentScale);
                 CGContext context = UIGraphics.GetCurrentContext();
