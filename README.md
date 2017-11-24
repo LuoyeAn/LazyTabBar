@@ -61,3 +61,7 @@ A LazyTabBarController that implements swiping left/right to switch controllers 
             public override UIColor UnSelectedTabBarTintColor => CommonHelper.RewardsText;
 
         }
+
+# Contributing
+Feel free to report an issue.
+And we're looking forward to your contributions via pull requests on GitHub.
