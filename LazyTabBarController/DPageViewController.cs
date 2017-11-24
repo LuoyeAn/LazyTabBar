@@ -14,21 +14,16 @@ using MvvmCross.Core.ViewModels;
 
 namespace LazyTabBarController
 {
+    [Register("LazyTabBarController")]
     public abstract class LazyTabBarController : UIViewController
     {
-        List<CustomTabBarItem> TabBarList;
+        private List<CustomTabBarItem> TabBarList;
+        private UIScrollView containerScrollView;
+        public List<UIViewController> ViewControllers;
 
-        private int TabBarHeight
-        {
-            get
-            {
-                if (IsIphoneX())
-                    return 104;
-                return 70;
-            }
-        }
+        private int TabBarHeight => IsIphoneX() ? 104 : 70;
 
-        nfloat width = UIScreen.MainScreen.Bounds.Width;
+        private nfloat width => UIScreen.MainScreen.Bounds.Width;
         private nfloat height => UIScreen.MainScreen.Bounds.Height - TabBarHeight;
 
         private bool IsIphoneX() => UIScreen.MainScreen.Bounds.Height == 812;
@@ -36,9 +31,6 @@ namespace LazyTabBarController
         public abstract UIViewController InitTabControllers(int index);
 
         public abstract (string name, string icon) InitTabBarNameAndIcon(int index);
-
-        UIScrollView containerScrollView;
-        public List<UIViewController> ViewControllers;
 
         private int? _otherIndex;
         public int? OtherIndex
@@ -206,13 +198,13 @@ namespace LazyTabBarController
                             containerScrollView.AlwaysBounceHorizontal = false;
                             containerScrollView.ShowsHorizontalScrollIndicator = false;
                             containerScrollView.Delegate = new ScrollViewDelegate(this);
-                            if(!new MvxIosMajorVersionChecker(11).IsVersionOrHigher)
+                            if (new MvxIosMajorVersionChecker(11).IsVersionOrHigher)
                             {
-                                 containerScrollView.ContentInsetAdjustmentBehavior= UIScrollViewContentInsetAdjustmentBehavior.Never;
+                                containerScrollView.ContentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentBehavior.Never;
                             }
                             else
                             {
-                                 this.AutomaticallyAdjustsScrollViewInsets=false;
+                                this.AutomaticallyAdjustsScrollViewInsets=false;
                             }
                         }
                     },
@@ -260,6 +252,7 @@ namespace LazyTabBarController
         public virtual UIColor SelectedTabBarTintColor => UIColor.Green;
         public virtual UIColor UnSelectedTabBarTintColor => UIColor.Gray;
         public virtual UIFont TabBarFont => new UILabel().Font;
+        public virtual int DisHcolorIndex => -1;
 
         private CustomTabBarItem GetTabBarItem(string imageName, string title, Action<int> action, int index)
         {
@@ -267,13 +260,14 @@ namespace LazyTabBarController
             {
                 SelectedColor = SelectedTabBarTintColor,
                 UnSelectedColor = UnSelectedTabBarTintColor,
-                DisHColor = index == 2
+                DisHColor = index == DisHcolorIndex
             };
             return customTabBarItem;
         }
 
         public MvxCommand<int> ChangeDotCommand
-            => new MvxCommand<int>((t) => {
+            => new MvxCommand<int>((t) =>
+            {
                 var tabBarItem = TabBarList.ElementAtOrDefault(2);
                 if (tabBarItem == null)
                     return;
