@@ -236,12 +236,6 @@ namespace LazyTabBarController
         {
             base.ViewWillAppear(animated);
             this.NavigationController.NavigationBarHidden = true;
-            //this.NavigationController.NavigationBar.TintColor = UIColor.White.ColorWithAlpha(0);
-        }
-
-        public override void ViewDidLayoutSubviews()
-        {
-            base.ViewDidLayoutSubviews();
         }
 
         void LayoutPages()
