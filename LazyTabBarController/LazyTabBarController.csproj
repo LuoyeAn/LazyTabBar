@@ -14,7 +14,7 @@
     <AssemblyName>LazyTabBarController</AssemblyName>
     <PackOnBuild>true</PackOnBuild>
     <PackageId>LazyTabBar</PackageId>
-    <PackageVersion>1.0.1.2</PackageVersion>
+    <PackageVersion>1.0.1.3</PackageVersion>
     <Authors>TingtingAn</Authors>
     <Owners>Tingting</Owners>
     <PackageProjectUrl>https://github.com/TingtingAn/LazyTabBar</PackageProjectUrl>

@@ -484,7 +484,7 @@ namespace LazyTabBarController
                     if (!string.IsNullOrEmpty(_imageName) && _imageName.StartsWith("http"))
                     {
                         _image.SetImage(NSUrl.FromString(_imageName));
-                        _image.GetNativeView().LayoutParameters.Weight = 35;
+                        _image.GetNativeView().LayoutParameters.Width = 35;
                         _image.GetNativeView().LayoutParameters.Height = 35;
                         _image.GetLayoutHost().SetNeedsLayout();
                     }
@@ -504,7 +504,7 @@ namespace LazyTabBarController
                     if (!string.IsNullOrEmpty(_imageName) && _imageName.StartsWith("http"))
                     {
                         _image.SetImage(NSUrl.FromString(_imageName));
-                        _image.GetNativeView().LayoutParameters.Weight = 35;
+                        _image.GetNativeView().LayoutParameters.Width = 35;
                         _image.GetNativeView().LayoutParameters.Height = 35;
                         _image.GetLayoutHost().SetNeedsLayout();
                     }
