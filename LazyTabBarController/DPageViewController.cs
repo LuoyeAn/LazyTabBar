@@ -255,6 +255,7 @@ namespace LazyTabBarController
         public virtual UIColor UnSelectedTabBarTintColor => UIColor.Gray;
         public virtual UIFont TabBarFont => new UILabel().Font;
         public virtual int DisHcolorIndex => -1;
+        public virtual bool ShowTriangle => true;
 
         private CustomTabBarItem GetTabBarItem(string imageName, string title, Action<int> action, int index)
         {
@@ -262,7 +263,8 @@ namespace LazyTabBarController
             {
                 SelectedColor = SelectedTabBarTintColor,
                 UnSelectedColor = UnSelectedTabBarTintColor,
-                DisHColor = index == DisHcolorIndex
+                DisHColor = index == DisHcolorIndex,
+                ShowTriangle = ShowTriangle
             };
             return customTabBarItem;
         }
@@ -291,6 +293,7 @@ namespace LazyTabBarController
             private string _imageName;
             private int _index;
             public bool DisHColor { get; set; }
+            public bool ShowTriangle { get; set; }
 
             public CustomTabBarItem(string imageName, string title, Action<int> action, int index, UIFont titleFont)
             {
@@ -527,7 +530,7 @@ namespace LazyTabBarController
                 set
                 {
                     _selected = value;
-                    _bottomImage.GetNativeView().Gone = !value;
+                    _bottomImage.GetNativeView().Gone = !value && ShowTriangle;
                     SetColor();
                     _bottomImage.GetLayoutHost().SetNeedsLayout();
                 }
