@@ -62,6 +62,8 @@ namespace PageViewController.ViewControllers
             CurrentIndex = 2;
         }
 
+        public override bool ShowTriangle => false;
+
         public override UIColor SelectedTabBarTintColor => UIColor.Orange;
     }
 }

@@ -530,7 +530,7 @@ namespace LazyTabBarController
                 set
                 {
                     _selected = value;
-                    _bottomImage.GetNativeView().Gone = !value && !ShowTriangle;
+                    _bottomImage.GetNativeView().Gone = !ShowTriangle||!value;
                     SetColor();
                     _bottomImage.GetLayoutHost().SetNeedsLayout();
                 }
