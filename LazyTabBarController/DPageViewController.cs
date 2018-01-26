@@ -173,8 +173,8 @@ namespace LazyTabBarController
 
             for (var i = 0; i < _count; i++)
             {
-                var nameAndIcon = InitTabBarNameAndIcon(i);
-                var tabBar = GetTabBarItem(nameAndIcon.icon, nameAndIcon.name, (index) =>
+                var (name, icon) = InitTabBarNameAndIcon(i);
+                var tabBar = GetTabBarItem(icon, name, (index) =>
                 {
                     DisabledScorlledDelegate = true;
                     CurrentIndex = index;
@@ -221,15 +221,12 @@ namespace LazyTabBarController
             InitSelectedTab();
         }
 
-        public virtual void InitSelectedTab()
-        {
-            CurrentIndex = 0;
-        }
+        public virtual void InitSelectedTab() => CurrentIndex = 0;
 
         public override void ViewWillAppear(bool animated)
         {
             base.ViewWillAppear(animated);
-            this.NavigationController.NavigationBarHidden = true;
+            this.NavigationController.SetNavigationBarHidden(true,true);
         }
 
         void LayoutPages()
