@@ -256,7 +256,7 @@ namespace LazyTabBarController
 
         private CustomTabBarItem GetTabBarItem(string imageName, string title, Action<int> action, int index)
         {
-            var customTabBarItem = new CustomTabBarItem(imageName, title, action, index, TabBarFont)
+            var customTabBarItem = new CustomTabBarItem(imageName, title, action, index, TabBarFont, SetImageForTabBar(index))
             {
                 SelectedColor = SelectedTabBarTintColor,
                 UnSelectedColor = UnSelectedTabBarTintColor,
@@ -264,6 +264,11 @@ namespace LazyTabBarController
                 ShowTriangle = ShowTriangle
             };
             return customTabBarItem;
+        }
+
+        public virtual UIImageView SetImageForTabBar(int index)
+        {
+            return null;
         }
 
         public MvxCommand<int> ChangeDotCommand
@@ -292,7 +297,7 @@ namespace LazyTabBarController
             public bool DisHColor { get; set; }
             public bool ShowTriangle { get; set; }
 
-            public CustomTabBarItem(string imageName, string title, Action<int> action, int index, UIFont titleFont)
+            public CustomTabBarItem(string imageName, string title, Action<int> action, int index, UIFont titleFont,UIImageView uIImageView=null)
             {
                 _imageName = imageName;
                 _index = index;
@@ -320,8 +325,8 @@ namespace LazyTabBarController
                                     View=_image=new UIImageView(),
                                     LayoutParameters=new LayoutParameters(AutoSize.WrapContent,AutoSize.WrapContent)
                                     {
-                                        MaxWidth=35,
-                                        MaxHeight=35
+                                        MaxWidth=55,
+                                        MaxHeight=55
                                     },
                                     Init = view =>
                                     {
