@@ -248,28 +248,32 @@ namespace LazyTabBarController
             containerScrollView.ContentSize = new CGSize(Width * (nfloat)ViewControllers.Count, Height);
         }
 
-        public virtual UIColor SelectedTabBarTintColor => UIColor.Green;
-        public virtual UIColor UnSelectedTabBarTintColor => UIColor.Gray;
-        public virtual UIFont TabBarFont => new UILabel().Font;
+        public virtual UIColor SelectedTabBarTintColor(int index) => UIColor.Green;
+        public virtual UIColor UnSelectedTabBarTintColor(int index) => UIColor.Gray;
+        public virtual UIFont TabBarFont(int index) => new UILabel().Font;
         public virtual int DisHcolorIndex => -1;
         public virtual bool ShowTriangle => true;
+        public Action<UIImageView> SetBottomImageViewAction {private get; set; }
+
 
         private CustomTabBarItem GetTabBarItem(string imageName, string title, Action<int> action, int index)
         {
-            var customTabBarItem = new CustomTabBarItem(imageName, title, action, index, TabBarFont, SetImageForTabBar(index))
+            var customTabBarItem = new CustomTabBarItem(imageName, title, action, index, TabBarFont(index), SetImageForTabBar(index))
             {
-                SelectedColor = SelectedTabBarTintColor,
-                UnSelectedColor = UnSelectedTabBarTintColor,
+                SelectedColor = SelectedTabBarTintColor(index),
+                UnSelectedColor = UnSelectedTabBarTintColor(index),
                 DisHColor = index == DisHcolorIndex,
                 ShowTriangle = ShowTriangle
             };
+            customTabBarItem.SetBottom(SetBottomImageViewAction);
             return customTabBarItem;
         }
-
-        public virtual UIImageView SetImageForTabBar(int index)
-        {
-            return null;
-        }
+        /// <summary>
+        /// custom imageview For Tabbar
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        public virtual UIImageView SetImageForTabBar(int index) => null;
 
         public MvxCommand<int> ChangeDotCommand
             => new MvxCommand<int>((t) =>
@@ -296,7 +300,6 @@ namespace LazyTabBarController
             private int _index;
             public bool DisHColor { get; set; }
             public bool ShowTriangle { get; set; }
-
             public CustomTabBarItem(string imageName, string title, Action<int> action, int index, UIFont titleFont,UIImageView uIImageView=null)
             {
                 _imageName = imageName;
@@ -322,11 +325,11 @@ namespace LazyTabBarController
                             {
                                 new NativeView
                                 {
-                                    View=_image=new UIImageView(),
+                                    View=_image=uIImageView??new UIImageView(),
                                     LayoutParameters=new LayoutParameters(AutoSize.WrapContent,AutoSize.WrapContent)
                                     {
-                                        MaxWidth=55,
-                                        MaxHeight=55
+                                        MaxWidth=35,
+                                        MaxHeight=35
                                     },
                                     Init = view =>
                                     {
@@ -415,6 +418,13 @@ namespace LazyTabBarController
                 SetDot(0);
             }
 
+            public void SetBottom(Action<UIImageView> action)
+            {
+                if (_bottomImage == null)
+                    return;
+                action?.Invoke(_bottomImage);
+            }
+
             public void SetDot(int dotCount)
             {
                 if (_dotLabel == null)
@@ -456,10 +466,7 @@ namespace LazyTabBarController
                 return size;
             }
 
-            private string GetString(int dotCount)
-            {
-                return string.Format("  {0}  ", dotCount < 99 ? dotCount.ToString() : "99+");
-            }
+            private string GetString(int dotCount) => string.Format("  {0}  ", dotCount < 99 ? dotCount.ToString() : "99+");
 
             private UIColor _selectedColor = UIColor.Red;
             public UIColor SelectedColor
