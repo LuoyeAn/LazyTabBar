@@ -64,6 +64,9 @@ namespace PageViewController.ViewControllers
 
         public override bool ShowTriangle => false;
 
-        public override UIColor SelectedTabBarTintColor => UIColor.Orange;
+        public override UIColor SelectedTabBarTintColor(int index)
+        {
+            return UIColor.Orange;
+        }
     }
 }

@@ -6,11 +6,11 @@ using System.Text;
 using UIKit;
 using CoreGraphics;
 using XibFree;
-using MvvmCross.Platform.iOS.Platform;
 using Foundation;
 using SDWebImage;
 using System.Drawing;
-using MvvmCross.Core.ViewModels;
+using MvvmCross.Platforms.Ios;
+using MvvmCross.Commands;
 
 namespace LazyTabBarController
 {
@@ -200,7 +200,7 @@ namespace LazyTabBarController
                             containerScrollView.AlwaysBounceHorizontal = false;
                             containerScrollView.ShowsHorizontalScrollIndicator = false;
                             containerScrollView.Delegate = new ScrollViewDelegate(this);
-                            if (new MvxIosMajorVersionChecker(11).IsVersionOrHigher)
+                            if (UIDevice.CurrentDevice.CheckSystemVersion(11,0))
                             {
                                 containerScrollView.ContentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentBehavior.Never;
                             }
