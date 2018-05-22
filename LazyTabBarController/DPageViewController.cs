@@ -532,8 +532,8 @@ namespace LazyTabBarController
                         else
                             _image.Image = CreateColoredImage(SelectedColor, UIImage.FromBundle(_imageName));
                     }
-
-                    _bottomImage.Image = CreateColoredImage(SelectedColor, UIImage.FromBundle("trigon"));
+                    if(!IsArrowFixedColor)
+                        _bottomImage.Image = CreateColoredImage(SelectedColor, UIImage.FromBundle("trigon"));
                     _titleLabel.TextColor = SelectedColor;
                 }
                 else
@@ -552,7 +552,8 @@ namespace LazyTabBarController
                         else
                             _image.Image = CreateColoredImage(UnSelectedColor, UIImage.FromBundle(_imageName));
                     }
-                    _bottomImage.Image = CreateColoredImage(UnSelectedColor, UIImage.FromBundle("trigon"));
+                    if (!IsArrowFixedColor)
+                        _bottomImage.Image = CreateColoredImage(UnSelectedColor, UIImage.FromBundle("trigon"));
                     _titleLabel.TextColor = UnSelectedColor;
                 }
             }
