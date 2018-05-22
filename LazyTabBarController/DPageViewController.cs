@@ -1,15 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-
 using UIKit;
 using CoreGraphics;
 using XibFree;
 using Foundation;
 using SDWebImage;
 using System.Drawing;
-using MvvmCross.Platforms.Ios;
 using MvvmCross.Commands;
 
 namespace LazyTabBarController
@@ -226,7 +223,7 @@ namespace LazyTabBarController
         public override void ViewWillAppear(bool animated)
         {
             base.ViewWillAppear(animated);
-            this.NavigationController.SetNavigationBarHidden(true,true);
+            this.NavigationController.SetNavigationBarHidden(true, true);
         }
 
         void LayoutPages()
@@ -253,12 +250,30 @@ namespace LazyTabBarController
         public virtual UIFont TabBarFont(int index) => new UILabel().Font;
         public virtual int DisHcolorIndex => -1;
         public virtual bool ShowTriangle => true;
-        public Action<UIImageView> SetBottomImageViewAction {private get; set; }
+        public virtual UIColor ArrowFixedColor => null;
+        public virtual bool IsArrowFixedColor => true;
+        public Action<UIImageView> SetBottomImageViewAction { private get; set; }
 
 
         private CustomTabBarItem GetTabBarItem(string imageName, string title, Action<int> action, int index)
         {
-            var customTabBarItem = new CustomTabBarItem(imageName, title, action, index, TabBarFont(index), SetImageForTabBar(index))
+            //var customTabBarItem = new CustomTabBarItem(imageName, title, action, index, TabBarFont(index), SetImageForTabBar(index))
+            //{
+            //    SelectedColor = SelectedTabBarTintColor(index),
+            //    UnSelectedColor = UnSelectedTabBarTintColor(index),
+            //    DisHColor = index == DisHcolorIndex,
+            //    ShowTriangle = ShowTriangle
+            //};
+            var customTabBarItem = new CustomTabBarItem(new TabBarParamsModel {
+                ImageName = imageName,
+                Title = title,
+                Action = action,
+                Index = index,
+                TitleFont = TabBarFont(index),
+                TabBarImageView = SetImageForTabBar(index),
+                IsArrowFixedColor = this.IsArrowFixedColor,
+                ArrowFixedColor = this.ArrowFixedColor
+            })
             {
                 SelectedColor = SelectedTabBarTintColor(index),
                 UnSelectedColor = UnSelectedTabBarTintColor(index),
@@ -300,10 +315,12 @@ namespace LazyTabBarController
             private int _index;
             public bool DisHColor { get; set; }
             public bool ShowTriangle { get; set; }
-            public CustomTabBarItem(string imageName, string title, Action<int> action, int index, UIFont titleFont,UIImageView uIImageView=null)
+            public bool IsArrowFixedColor { get; set; }
+            public CustomTabBarItem(TabBarParamsModel model)
             {
-                _imageName = imageName;
-                _index = index;
+                _imageName = model.ImageName;
+                _index = model.Index;
+                IsArrowFixedColor = model.IsArrowFixedColor;
                 LayoutParameters = new LayoutParameters(AutoSize.FillParent, 70);
                 View = new UILayoutHost(new LinearLayout(Orientation.Vertical)
                 {
@@ -325,7 +342,7 @@ namespace LazyTabBarController
                             {
                                 new NativeView
                                 {
-                                    View=_image=uIImageView??new UIImageView(),
+                                    View=_image=model.TabBarImageView??new UIImageView(),
                                     LayoutParameters=new LayoutParameters(AutoSize.WrapContent,AutoSize.WrapContent)
                                     {
                                         MaxWidth=35,
@@ -334,9 +351,9 @@ namespace LazyTabBarController
                                     Init = view =>
                                     {
                                         var imageView=view.As<UIImageView>();
-                                        imageView.Image = UIImage.FromBundle(imageName);
+                                        imageView.Image = UIImage.FromBundle(model.ImageName);
                                     },
-                                    Gone=string.IsNullOrEmpty(imageName)
+                                    Gone=string.IsNullOrEmpty(model.ImageName)
                                 },
                                 new NativeView
                                 {
@@ -344,7 +361,7 @@ namespace LazyTabBarController
                                     {
                                         TextColor=UIColor.White,
                                         BackgroundColor=SelectedColor,
-                                        Font= UIFont.FromName(titleFont.Name,12f),
+                                        Font= UIFont.FromName(model.TitleFont.Name,12f),
                                     },
                                     LayoutParameters=new LayoutParameters
                                     {
@@ -365,21 +382,21 @@ namespace LazyTabBarController
                         {
                             View=new UIView(),
                             LayoutParameters=new LayoutParameters(AutoSize.FillParent,5),
-                            Gone=string.IsNullOrEmpty(title)||string.IsNullOrEmpty(imageName)
+                            Gone=string.IsNullOrEmpty(model.Title)||string.IsNullOrEmpty(model.ImageName)
                         },
                         new NativeView
                         {
                             View=_titleLabel=new UILabel()
                             {
-                                Text=title,
+                                Text=model.Title,
                                 TextAlignment= UITextAlignment.Center,
                                 TextColor=UIColor.Gray,
-                                Font=titleFont
+                                Font=model.TitleFont
                             },
                             LayoutParameters=new LayoutParameters(AutoSize.FillParent,AutoSize.WrapContent)
                             {
                             },
-                            Gone=string.IsNullOrEmpty(title)
+                            Gone=string.IsNullOrEmpty(model.Title)
                         },
                         new NativeView
                         {
@@ -391,12 +408,20 @@ namespace LazyTabBarController
                         },
                         new NativeView
                         {
-                            View=_bottomImage=new UIImageView {Image=UIImage.FromBundle("trigon") },
+                            View=_bottomImage=new UIImageView(),
                             LayoutParameters=new LayoutParameters(AutoSize.WrapContent,AutoSize.WrapContent)
                             {
                                 Gravity=Gravity.CenterHorizontal,
                                 MarginBottom=-7f,
                                 MarginTop=-7f
+                            },
+                            Init = view =>
+                            {
+                                var imageView=view.As<UIImageView>();
+                                if(model.IsArrowFixedColor)
+                                    imageView.Image= CreateColoredImage(model.ArrowFixedColor, UIImage.FromBundle("trigon"));
+                                else
+                                    imageView.Image=UIImage.FromBundle("trigon");
                             },
                             Gone=true
                         },
@@ -406,12 +431,12 @@ namespace LazyTabBarController
                 {
                     var uiView = view.As<UILayoutHost>();
                     var gesture = new UITapGestureRecognizer();
-                    uiView.AccessibilityIdentifier = imageName;
+                    uiView.AccessibilityIdentifier = model.ImageName;
                     gesture.NumberOfTapsRequired = 1;
                     uiView.AddGestureRecognizer(gesture);
                     gesture.AddTarget(() =>
                     {
-                        action?.Invoke(_index);
+                        model.Action?.Invoke(_index);
                     });
                 };
 
@@ -539,7 +564,7 @@ namespace LazyTabBarController
                 set
                 {
                     _selected = value;
-                    _bottomImage.GetNativeView().Gone = !ShowTriangle||!value;
+                    _bottomImage.GetNativeView().Gone = !ShowTriangle || !value;
                     SetColor();
                     _bottomImage.GetLayoutHost().SetNeedsLayout();
                 }
@@ -549,6 +574,8 @@ namespace LazyTabBarController
             {
                 if (mask == null)
                     throw new Exception($"LazyTabBar exception: cannot find the image named:{_imageName}");
+                if (color == null)
+                    return mask;
                 var rect = new CGRect(CGPoint.Empty, mask.Size);
                 UIGraphics.BeginImageContextWithOptions(mask.Size, false, mask.CurrentScale);
                 CGContext context = UIGraphics.GetCurrentContext();
@@ -560,6 +587,18 @@ namespace LazyTabBarController
                 UIGraphics.EndImageContext();
                 return result;
             }
+        }
+
+        private class TabBarParamsModel
+        {
+            public string ImageName { get; set; }
+            public string Title { get; set; }
+            public int Index { get; set; }
+            public UIFont TitleFont { get; set; }
+            public bool IsArrowFixedColor { get; set; }
+            public UIColor ArrowFixedColor { get; set; }
+            public Action<int> Action { get; set; }
+            public UIImageView TabBarImageView { get; set; }
         }
 
         private class ScrollViewDelegate : UIScrollViewDelegate

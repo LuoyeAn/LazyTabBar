@@ -14,12 +14,12 @@
     <AssemblyName>LazyTabBarController</AssemblyName>
     <PackOnBuild>true</PackOnBuild>
     <PackageId>LazyTabBar</PackageId>
-    <PackageVersion>1.1.0.0</PackageVersion>
+    <PackageVersion>1.1.1.0</PackageVersion>
     <Authors>TingtingAn</Authors>
     <Owners>Tingting</Owners>
     <PackageProjectUrl>https://github.com/TingtingAn/LazyTabBar</PackageProjectUrl>
     <Summary>A LazyTabBarController that implements swiping left/right to switch controllers and lazying to load controllers.</Summary>
-    <PackageTags>Xamarin  LazyTabBar</PackageTags>
+    <PackageTags>Xamarin.iOS  LazyTabBar</PackageTags>
     <Title>LazyTabBar</Title>
     <Description>A LazyTabBarController that implements swiping left/right to switch controllers and lazying to load controllers.</Description>
   </PropertyGroup>
