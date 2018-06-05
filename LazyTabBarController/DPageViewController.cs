@@ -7,7 +7,6 @@ using XibFree;
 using Foundation;
 using SDWebImage;
 using System.Drawing;
-using MvvmCross.Commands;
 
 namespace LazyTabBarController
 {
@@ -257,13 +256,6 @@ namespace LazyTabBarController
 
         private CustomTabBarItem GetTabBarItem(string imageName, string title, Action<int> action, int index)
         {
-            //var customTabBarItem = new CustomTabBarItem(imageName, title, action, index, TabBarFont(index), SetImageForTabBar(index))
-            //{
-            //    SelectedColor = SelectedTabBarTintColor(index),
-            //    UnSelectedColor = UnSelectedTabBarTintColor(index),
-            //    DisHColor = index == DisHcolorIndex,
-            //    ShowTriangle = ShowTriangle
-            //};
             var customTabBarItem = new CustomTabBarItem(new TabBarParamsModel {
                 ImageName = imageName,
                 Title = title,
@@ -290,8 +282,8 @@ namespace LazyTabBarController
         /// <returns></returns>
         public virtual UIImageView SetImageForTabBar(int index) => null;
 
-        public MvxCommand<int> ChangeDotCommand
-            => new MvxCommand<int>((t) =>
+        public Action<int> ChangeDotCommand
+            => new Action<int>((t) =>
             {
                 var tabBarItem = TabBarList.ElementAtOrDefault(2);
                 if (tabBarItem == null)
@@ -299,8 +291,8 @@ namespace LazyTabBarController
                 tabBarItem.SetDot(t);
             });
 
-        public MvxCommand<int> ChangeCurrentIndexCommand
-            => new MvxCommand<int>((t) =>
+        public Action<int> ChangeCurrentIndexCommand
+            => new Action<int>((t) =>
             {
                 containerScrollView.SetContentOffset(new CGPoint(Width * t, 0), true);
             });
@@ -401,9 +393,9 @@ namespace LazyTabBarController
                         new NativeView
                         {
                             View=new UIView(),
-                            LayoutParameters=new LayoutParameters(AutoSize.FillParent,AutoSize.FillParent)
+                            LayoutParameters=new LayoutParameters(AutoSize.FillParent,7)
                             {
-                                MinHeight=7
+                                //MinHeight=7
                             }
                         },
                         new NativeView
