@@ -18,7 +18,7 @@ namespace LazyTabBarController
         public List<UIViewController> ViewControllers;
         public event EventHandler<int> PageIndexChanged;
 
-        private int TabBarHeight => IsIphoneX() ? 104 : 70;
+        private int TabBarHeight => IsIphoneX ? 104 : 70;
 
         private nfloat Width => UIScreen.MainScreen.Bounds.Width;
         private nfloat Height => UIScreen.MainScreen.Bounds.Height - TabBarHeight;
@@ -26,7 +26,7 @@ namespace LazyTabBarController
         /// the device is iphonex, iphonexr, iphonexs or iphonexs max
         /// </summary>
         /// <returns></returns>
-        private bool IsIphoneX() => UIScreen.MainScreen.Bounds.Height == 812 || UIScreen.MainScreen.Bounds.Height == 896;
+        private bool IsIphoneX => UIScreen.MainScreen.Bounds.Height == 812 || UIScreen.MainScreen.Bounds.Height == 896;
 
         public abstract UIViewController InitTabControllers(int index);
 
@@ -167,7 +167,7 @@ namespace LazyTabBarController
                     BorderWidth = 0.5f
                 },
                 LayoutParameters = new LayoutParameters(AutoSize.FillParent, TabBarHeight),
-                Padding = new UIEdgeInsets(0, 0, IsIphoneX() ? 34 : 0, 0)
+                Padding = new UIEdgeInsets(0, 0, IsIphoneX ? 34 : 0, 0)
             };
 
             for (var i = 0; i < _count; i++)
