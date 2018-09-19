@@ -22,8 +22,11 @@ namespace LazyTabBarController
 
         private nfloat Width => UIScreen.MainScreen.Bounds.Width;
         private nfloat Height => UIScreen.MainScreen.Bounds.Height - TabBarHeight;
-
-        private bool IsIphoneX() => UIScreen.MainScreen.Bounds.Height == 812;
+        /// <summary>
+        /// the device is iphonex, iphonexr, iphonexs or iphonexs max
+        /// </summary>
+        /// <returns></returns>
+        private bool IsIphoneX() => UIScreen.MainScreen.Bounds.Height >= 812;
 
         public abstract UIViewController InitTabControllers(int index);
 
