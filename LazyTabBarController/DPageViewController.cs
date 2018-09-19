@@ -26,7 +26,7 @@ namespace LazyTabBarController
         /// the device is iphonex, iphonexr, iphonexs or iphonexs max
         /// </summary>
         /// <returns></returns>
-        private bool IsIphoneX() => UIScreen.MainScreen.Bounds.Height >= 812;
+        private bool IsIphoneX() => UIScreen.MainScreen.Bounds.Height == 812 || UIScreen.MainScreen.Bounds.Height == 896;
 
         public abstract UIViewController InitTabControllers(int index);
 
@@ -259,7 +259,8 @@ namespace LazyTabBarController
 
         private CustomTabBarItem GetTabBarItem(string imageName, string title, Action<int> action, int index)
         {
-            var customTabBarItem = new CustomTabBarItem(new TabBarParamsModel {
+            var customTabBarItem = new CustomTabBarItem(new TabBarParamsModel
+            {
                 ImageName = imageName,
                 Title = title,
                 Action = action,
@@ -527,7 +528,7 @@ namespace LazyTabBarController
                         else
                             _image.Image = CreateColoredImage(SelectedColor, UIImage.FromBundle(_imageName));
                     }
-                    if(!IsArrowFixedColor)
+                    if (!IsArrowFixedColor)
                         _bottomImage.Image = CreateColoredImage(SelectedColor, UIImage.FromBundle("trigon"));
                     _titleLabel.TextColor = SelectedColor;
                 }
