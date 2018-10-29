@@ -105,9 +105,12 @@ namespace LazyTabBarController
                     return;
                 _movingToCurrentPage = value;
 
+                if (ViewControllers == null || ViewControllers.Count == 0)
+                    return;
+
                 if (!value.HasValue)
                 {
-                    if (OtherIndex.HasValue)
+                    if (OtherIndex.HasValue && ViewControllers.Count > OtherIndex.Value)
                     {
                         var otherPage = ViewControllers[OtherIndex.Value];
                         otherPage?.WillMoveToParentViewController(null);
@@ -117,7 +120,7 @@ namespace LazyTabBarController
                 }
                 else
                 {
-                    if (OtherIndex.HasValue)
+                    if (OtherIndex.HasValue && ViewControllers.Count > OtherIndex.Value)
                     {
                         var otherPage = ViewControllers[OtherIndex.Value];
                         if (otherPage != null && otherPage.ParentViewController == null)
@@ -128,12 +131,15 @@ namespace LazyTabBarController
                         }
                     }
 
-                    var currentPage = ViewControllers[CurrentIndex];
-                    if (currentPage != null && currentPage.ParentViewController == null)
+                    if(ViewControllers.Count > CurrentIndex)
                     {
-                        AddChildViewController(currentPage);
-                        containerScrollView.AddSubview(currentPage.View);
-                        currentPage.DidMoveToParentViewController(this);
+                        var currentPage = ViewControllers[CurrentIndex];
+                        if (currentPage != null && currentPage.ParentViewController == null)
+                        {
+                            AddChildViewController(currentPage);
+                            containerScrollView.AddSubview(currentPage.View);
+                            currentPage.DidMoveToParentViewController(this);
+                        }
                     }
                 }
             }
