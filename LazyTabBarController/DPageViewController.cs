@@ -95,52 +95,62 @@ namespace LazyTabBarController
             }
         }
 
+        public Action<Exception,Dictionary<string,string>> ExeceptionAction { get; set; }
+
         private bool? _movingToCurrentPage;
         public bool? MovingToCurrentPage
         {
             get => _movingToCurrentPage;
             set
             {
-                if (_movingToCurrentPage == value)
-                    return;
-                _movingToCurrentPage = value;
-
-                if (ViewControllers == null || ViewControllers.Count == 0)
-                    return;
-
-                if (!value.HasValue)
+                try
                 {
-                    if (OtherIndex.HasValue && ViewControllers.Count > OtherIndex.Value)
+                    if (_movingToCurrentPage == value)
+                        return;
+                    _movingToCurrentPage = value;
+
+                    if (ViewControllers == null || ViewControllers.Count == 0)
+                        return;
+
+                    if (!value.HasValue)
                     {
-                        var otherPage = ViewControllers[OtherIndex.Value];
-                        otherPage?.WillMoveToParentViewController(null);
-                        otherPage?.RemoveFromParentViewController();
-                        otherPage?.View.RemoveFromSuperview();
+                        if (OtherIndex.HasValue && ViewControllers.Count > OtherIndex.Value)
+                        {
+                            var otherPage = ViewControllers[OtherIndex.Value];
+                            otherPage?.WillMoveToParentViewController(null);
+                            otherPage?.RemoveFromParentViewController();
+                            otherPage?.View.RemoveFromSuperview();
+                        }
+                    }
+                    else
+                    {
+                        if (OtherIndex.HasValue && ViewControllers.Count > OtherIndex.Value)
+                        {
+                            var otherPage = ViewControllers[OtherIndex.Value];
+                            if (otherPage != null && otherPage.ParentViewController == null)
+                            {
+                                AddChildViewController(otherPage);
+                                containerScrollView.AddSubview(otherPage.View);
+                                otherPage.DidMoveToParentViewController(this);
+                            }
+                        }
+
+                        if (ViewControllers.Count > CurrentIndex)
+                        {
+                            var currentPage = ViewControllers[CurrentIndex];
+                            if (currentPage != null && currentPage.ParentViewController == null)
+                            {
+                                AddChildViewController(currentPage);
+                                containerScrollView.AddSubview(currentPage.View);
+                                currentPage.DidMoveToParentViewController(this);
+                            }
+                        }
                     }
                 }
-                else
+                catch(Exception ex)
                 {
-                    if (OtherIndex.HasValue && ViewControllers.Count > OtherIndex.Value)
-                    {
-                        var otherPage = ViewControllers[OtherIndex.Value];
-                        if (otherPage != null && otherPage.ParentViewController == null)
-                        {
-                            AddChildViewController(otherPage);
-                            containerScrollView.AddSubview(otherPage.View);
-                            otherPage.DidMoveToParentViewController(this);
-                        }
-                    }
-
-                    if(ViewControllers.Count > CurrentIndex)
-                    {
-                        var currentPage = ViewControllers[CurrentIndex];
-                        if (currentPage != null && currentPage.ParentViewController == null)
-                        {
-                            AddChildViewController(currentPage);
-                            containerScrollView.AddSubview(currentPage.View);
-                            currentPage.DidMoveToParentViewController(this);
-                        }
-                    }
+                    ExeceptionAction?.Invoke(ex,new Dictionary<string, string> { { "MovingToCurrentPage", MovingToCurrentPage?.ToString() },
+                        {"CurrentIndex",CurrentIndex.ToString()},{"OtherIndex",OtherIndex?.ToString() } });
                 }
             }
         }
